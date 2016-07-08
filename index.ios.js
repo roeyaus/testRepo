@@ -13,9 +13,13 @@ import {
   MapView,
   TouchableHighlight,
   ListView,
-  Alert
+  Alert,
+  Linking
 } from 'react-native';
 var DOMParser = require('xmldom').DOMParser;
+
+var showFreeIfUnderDuration = 10
+
 
 class valet extends Component {
   constructor(props) {
@@ -26,12 +30,18 @@ this.state = {
   initialPosition : { latitude : 0.00000, longitude : 0.00000},
   parkRadius : 4.0 //km
 }
+
 this._onPressButtonGetAvailable()
 // setInterval( () =>  { //tick
 //         this._onPressButtonGetAvailable()
 //     }, 10000)
 }
 
+componentDidMount() {
+    this.setState({
+      dataSource: this.state.dataSource.cloneWithRows( [{ name : "test", address: "testBlat 123", currentDuration : 15 }])
+    })
+}
 _getCarparkInfo(carPark)
 {
     //we get the carpark in the form of JSON from gisn.tel-aviv
@@ -148,6 +158,12 @@ _getCarparkInfo(carPark)
                 }
 
             }
+            //filter free parking if duration longer than showFreeIfUnderDuration
+            availableCarParks = availableCarParks.filter((a) =>
+                   (a.currentDuration <= showFreeIfUnderDuration &&
+                       a.pricePerHour == 0)
+                       || (a.pricePerHour != 0)
+            )
             //now sort our array according to duration in 5 minute intervals then secondary sort according to pricePerHour
             availableCarParks.sort((a,b) => {
                 return a.currentDuration - b.currentDuration
@@ -176,20 +192,31 @@ _getCarparkInfo(carPark)
 }).done()
 }
 
+_rowPressed(address) {
+    Linking.openURL("waze://?q=" + address).catch(err => console.error('An error occurred', err));
+}
+
 _onPressButtonGetAvailable = () => { this._getCarParks() }
 
 renderPark(park) {
     return (
-      <View style={styles.container}>
-          <Text>{park.name}, time : {park.currentDuration}</Text>
+        <TouchableHighlight onPress={() => this._rowPressed(park.address)}
+       underlayColor='#dddddd'>
+      <View style={styles.cellView}>
+          <Text style={styles.distanceText}>{park.currentDuration.toFixed(0)}</Text>
+          <View style = {styles.infoView}>
+          <Text style={styles.infoText}>{park.name}</Text>
+          <Text style={styles.infoText}>{park.address}</Text>
+          </View>
       </View>
+      </TouchableHighlight>
     );
   }
 
 
   render() {
     return (
-        <View style={styles.container}>
+        <View style={styles.mainView}>
       <ListView
           dataSource={this.state.dataSource}
           renderRow={this.renderPark}
@@ -202,10 +229,33 @@ renderPark(park) {
 const styles = StyleSheet.create({
   mainView: {
     flex: 1,
-    flexDirection : 'column'
-    justifyContent: 'center',
+    flexDirection : 'column',
+    paddingTop:30,
     backgroundColor: '#F5FCFF',
-}
+},
+  cellView: {
+      backgroundColor: '#BAF2F5',
+      flexDirection : 'row',
+      paddingLeft:30,
+      paddingBottom : 20,
+      paddingTop : 20,
+      paddingRight : 30,
+      justifyContent :  'flex-start',
+      borderRadius: 20,
+      marginBottom : 5,
+      marginTop : 5
+  },
+  distanceText : {
+      fontFamily : 'arial',
+      fontSize : 40,
+      marginRight:30
+  },
+  infoText : {
+      fontSize : 20
+  },
+  infoView: {
+      flexDirection : 'column',
+  }
 });
 
 AppRegistry.registerComponent('valet', () => valet);
