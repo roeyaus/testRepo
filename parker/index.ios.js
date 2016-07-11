@@ -14,13 +14,17 @@ import {
   TouchableHighlight,
   ListView,
   Alert,
-  Linking
+  Linking,
+  Image
 } from 'react-native';
 var DOMParser = require('xmldom').DOMParser;
 
 var showFreeIfUnderDuration = 10
-
-
+var VacancyEnum = {
+    Vacant : 0,
+    Full : 1,
+    Unknown : 2
+}
 class valet extends Component {
   constructor(props) {
 super(props)
@@ -30,8 +34,8 @@ this.state = {
   initialPosition : { latitude : 0.00000, longitude : 0.00000},
   parkRadius : 4.0 //km
 }
-
-this._onPressButtonGetAvailable()
+this.renderPark = this.renderPark.bind(this)
+//this._onPressButtonGetAvailable()
 // setInterval( () =>  { //tick
 //         this._onPressButtonGetAvailable()
 //     }, 10000)
@@ -55,7 +59,7 @@ _getCarparkInfo(carPark)
         ahuzatHof : false,
         currentDistance : 9999,
         currentDuration : 9999,
-        vacancy : false
+        vacancy : VacancyEnum.Unknown
     }
 
 }
@@ -107,7 +111,7 @@ _getCarparkInfo(carPark)
                     if (ahuzotHofJSON.features[ahuzatHof].attributes.status_chenyon == "פנוי" || ahuzotHofJSON.features[ahuzatHof].attributes.status_chenyon == "מעט")
                     {
 
-                        allParks[carPark].vacancy = true
+                        allParks[carPark].vacancy = VacancyEnum.Vacant
                         console.log("car park : " + JSON.stringify(allParks[carPark]))
                     }
                 }
@@ -128,9 +132,13 @@ _getCarparkInfo(carPark)
                  }
              })
         }
-        //query the google maps api
+        //query the google maps api but we need to do this in stages
+        //in case the list of lots is too big
         var destString = ""
-        var availableCarParks = allParks.filter( (a) => a.vacancy == true )
+        var availableCarParks = allParks.filter( (a) =>
+                a.vacancy == VacancyEnum.Vacant
+             //|| a.vacancy == VacancyEnum.Unknown
+        )
         console.log("availableCarParks : " + availableCarParks)
         for (var i in availableCarParks)
         {
@@ -152,7 +160,7 @@ _getCarparkInfo(carPark)
             for (i in data.rows[0].elements)
             {
                 console.log(JSON.stringify(data.rows[0].elements[i]))
-                if (data.rows[0].elements[i].status != "NOT_FOUND")
+                if (data.rows[0].elements[i].status == "OK")
                 {
                     availableCarParks[i].currentDuration = data.rows[0].elements[i].duration.value / 60
                 }
@@ -192,22 +200,31 @@ _getCarparkInfo(carPark)
 }).done()
 }
 
-_rowPressed(address) {
-    Linking.openURL("waze://?q=" + address).catch(err => console.error('An error occurred', err));
-}
+
 
 _onPressButtonGetAvailable = () => { this._getCarParks() }
-
+_wazePressed(park){
+    console.log("Launching waze for : " + park.address)
+    //Linking.openURL("waze://?q=" + park.address).catch(err => Alert.alert('Cannot launch waze, An error occurred', err));
+}
+_rowPressed(park){
+    console.log("Launching details page ")
+}
+_
 renderPark(park) {
     return (
-        <TouchableHighlight onPress={() => this._rowPressed(park.address)}
-       underlayColor='#dddddd'>
+        <TouchableHighlight onPress={() => this._rowPressed(park)}>
       <View style={styles.cellView}>
           <Text style={styles.distanceText}>{park.currentDuration.toFixed(0)}</Text>
           <View style = {styles.infoView}>
           <Text style={styles.infoText}>{park.name}</Text>
           <Text style={styles.infoText}>{park.address}</Text>
           </View>
+          <TouchableHighlight onPress={() => this._wazePressed(park)}>
+            <Image source={require('./img/waze_icon.png')}
+                style = { styles.wazeImage }
+                resizeMode={Image.resizeMode.contain}/>
+        </TouchableHighlight>
       </View>
       </TouchableHighlight>
     );
@@ -236,13 +253,16 @@ const styles = StyleSheet.create({
   cellView: {
       backgroundColor: '#BAF2F5',
       flexDirection : 'row',
+      alignItems : 'center',
       paddingLeft:30,
       paddingBottom : 20,
       paddingTop : 20,
       paddingRight : 30,
-      justifyContent :  'flex-start',
+      justifyContent :  'space-between',
       borderRadius: 20,
       marginBottom : 5,
+      marginLeft : 5,
+      marginRight : 5,
       marginTop : 5
   },
   distanceText : {
@@ -255,6 +275,12 @@ const styles = StyleSheet.create({
   },
   infoView: {
       flexDirection : 'column',
+
+  },
+  wazeImage : {
+      resizeMode : 'contain',
+      width : 70,
+      height : 70
   }
 });
 
