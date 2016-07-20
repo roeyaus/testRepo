@@ -210,7 +210,7 @@ _wazePressed(park){
 _rowPressed(park){
     console.log("Launching details page ")
 }
-_
+
 renderPark(park) {
     return (
         <TouchableHighlight onPress={() => this._rowPressed(park)}>
