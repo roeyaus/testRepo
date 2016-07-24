@@ -17,9 +17,10 @@ const initialState = {
 function user(state = initialState, action) {
   switch (action.type) {
     case SET_CURRENT_USER:
-          return Object.assign({}, todo, {
+          return {
+              ...state,
             user: action.user
-          })
+          }
     default:
       return state
   }

@@ -31,6 +31,7 @@ module.exports = class Parkz extends React.Component {
                 isLoading : false,
                 currentUser : current_user
         })
+
     }
 async _retrieveUser() {
     try {
@@ -47,33 +48,24 @@ async _retrieveUser() {
 }
   render() {
     const menu = <ParkzMenu/>;
+    if (this.state.isLoading)
+    {
         return (
-            <Navigator
-            initialRoute={{ id: loggedIn ? 'loggedIn' : 'notLoggedIn' }}
-            renderScene={(route, navigator) => {
-                    if (this.state.isLoading)
-                    {
-                        return (
-                            <Text>Loading...</Text>
-                        )
-                    }
-                    //console.log("currentUser : " + JSON.stringify(currentUser))
-                    if (this.state.currentUser != null) {
-                        return (
-                            <SideMenu menu={menu}>
-                              <MainScreen/>
-                            </SideMenu>
-                        )
-                    }
-                    else {
-                        return (
-                            <FirstUse/>
-                        )
-                    }
-
-            }
-
-            }/>
-        );
+            <Text>Loading...</Text>
+        )
+    }
+    //console.log("currentUser : " + JSON.stringify(currentUser))
+    if (this.state.currentUser != null) {
+        return (
+            <SideMenu menu={menu}>
+              <MainScreen navigator = {this.props.navigator}/>
+            </SideMenu>
+        )
+    }
+    else {
+        return (
+            <FirstUse navigator = {this.props.navigator}/>
+        )
+    }
     }
 }

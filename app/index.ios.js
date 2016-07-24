@@ -2,20 +2,20 @@ import React, { Component } from 'react';
 import {
  AppRegistry
 } from 'react-native';
-//import { createStore, combineReducers } from 'redux';
-//import { Provider } from 'react-redux';
+import { createStore, combineReducers } from 'redux';
+import { Provider } from 'react-redux';
 
-var Parkz = require('./Parkz.js')
-//import parkzReducer from './parkzReducers'
-//let store = createStore(parkzReducer)
+var ParkzNav = require('./ParkzNav.js')
+import parkzReducer from './reducers/parkzReducers'
+let store = createStore(parkzReducer)
 
-export default class Application extends Component {
+class Application extends Component {
   render() {
     return (
-      //<Provider store={store}>
-        <Parkz />
-     // </Provider>
+      <Provider store={store}>
+        <ParkzNav />
+      </Provider>
     );
   }
 }
-AppRegistry.registerComponent('Application', () => Application);
+AppRegistry.registerComponent('parkz', () => Application);
