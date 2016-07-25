@@ -1,21 +1,31 @@
-import React, { Component } from 'react';
-import {
- AppRegistry
-} from 'react-native';
-import { createStore, combineReducers } from 'redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
-
-var ParkzNav = require('./ParkzNav.js')
+import { Navigation } from 'react-native-navigation';
+import thunk from 'redux-thunk';
 import parkzReducer from './reducers/parkzReducers'
-let store = createStore(parkzReducer)
+// redux related book keeping
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+const store = createStoreWithMiddleware(parkzReducer);
 
-class Application extends Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <ParkzNav />
-      </Provider>
-    );
+// screen related book keeping
+import { registerScreens } from './screens';
+registerScreens(store, Provider);
+
+
+//react native navigation with redux requires this
+export default class Application  {
+  constructor(props)
+  {
+      Navigation.startSingleScreenApp({
+        screen: {
+          screen: 'Parkz.InitialScreen',
+          title: 'Initial',
+          navigatorStyle: {}
+        },
+        passProps: {
+        }
+      });
   }
 }
-AppRegistry.registerComponent('parkz', () => Application);
+
+const App = new Application()

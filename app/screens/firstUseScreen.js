@@ -10,7 +10,7 @@ import {
   Button
 } from 'react-native';
 
-module.exports = class FirstUse extends React.Component {
+module.exports = class FirstUseScreen extends React.Component {
     constructor(props) {
         super(props)
     }

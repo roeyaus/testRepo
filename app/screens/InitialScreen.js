@@ -10,13 +10,9 @@ import {
   AsyncStorage
 } from 'react-native';
 
-const SideMenu = require('react-native-side-menu');
-const ParkzMenu = require('./sideMenu.js')
-const FirstUse = require('./firstUseScreen.js')
-const MainScreen = require('./mainScreen.js')
 const loggedIn = true
 
-module.exports = class Parkz extends React.Component {
+module.exports = class InitialScreen extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -27,10 +23,23 @@ module.exports = class Parkz extends React.Component {
 
     async componentWillMount() {
         current_user = await this._retrieveUser()
-        this.setState( {
-                isLoading : false,
-                currentUser : current_user
-        })
+        //if we have a current_user, navigate to MainScreen, else to FirstUse
+        if (current_user != null)
+        {
+            this.props.navigator.push({
+              title: "MainScreen",
+              screen: "Parkz.MainScreen",
+              passProps: { current_user }
+            });
+        }
+        else {
+            this.props.navigator.push({
+              title: "FirstUseScreen",
+              screen: "Parkz.FirstUseScreen",
+              passProps: { current_user }
+            });
+        }
+
 
     }
 async _retrieveUser() {
@@ -38,7 +47,7 @@ async _retrieveUser() {
         var value = await AsyncStorage.getItem('@Parkz:currentUser');
         if (value != null){
             // We have data!!
-            }
+        }
     } catch (error) {
       // Error retrieving data
       console.log("error retrieving user : " + error)
@@ -47,7 +56,6 @@ async _retrieveUser() {
     return value
 }
   render() {
-    const menu = <ParkzMenu/>;
     if (this.state.isLoading)
     {
         return (
@@ -55,17 +63,6 @@ async _retrieveUser() {
         )
     }
     //console.log("currentUser : " + JSON.stringify(currentUser))
-    if (this.state.currentUser != null) {
-        return (
-            <SideMenu menu={menu}>
-              <MainScreen navigator = {this.props.navigator}/>
-            </SideMenu>
-        )
-    }
-    else {
-        return (
-            <FirstUse navigator = {this.props.navigator}/>
-        )
-    }
+
     }
 }
