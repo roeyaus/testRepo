@@ -7,7 +7,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 
-module.exports = class ParkzMenu extends React.Component {
+export default class SideMenu extends React.Component {
   render() {
       return (
       <View style={styles.menuView}>

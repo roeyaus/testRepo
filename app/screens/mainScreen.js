@@ -11,29 +11,15 @@ import {
 } from 'react-native';
 
 
-const SideMenu = require('react-native-side-menu');
-const ParkzMenu = require('./sideMenu.js')
+import MapScreen from './MapScreen.js'
 module.exports = class MainScreen extends React.Component {
 constructor(props) {
     super(props)
+    //enable navigator drawer 
 }
 
 render() {
-  const menu = <ParkzMenu/>;
-  if (this.state.isLoading)
-  {
-      return (
-          <Text>Loading...</Text>
-      )
-  }
-  //console.log("currentUser : " + JSON.stringify(currentUser))
-  if (this.props.currentUser != null) {
-      return (
-          <SideMenu menu={menu}>
-            <MapScreen/>
-          </SideMenu>
-      )
-  }
+  return <MapScreen/>
   }
 
   }

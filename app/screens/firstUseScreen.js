@@ -9,22 +9,33 @@ import {
   TextInput,
   Button
 } from 'react-native';
+import { connect } from 'react-redux'
 
-module.exports = class FirstUseScreen extends React.Component {
+class FirstUseScreen extends React.Component {
     constructor(props) {
         super(props)
     }
   render() {
       return (
       <View style={styles.menuView}>
-          <Text>Hello,</Text>
+          <Text>Hello, {this.props.user == null ? "guest" : this.props.user.firstName}</Text>
           <View style={styles.buttonRowView}>
           <TouchableHighlight style={[styles.button, styles.loginButton]}
-            onPress = {() => {this.props.navigator.push({ name : 'loginScreen'})}}>
+            onPress = {() => {this.props.navigator.push({
+              title: "Log In",
+              screen: "Parkz.LoginScreen",
+              passProps: { }
+            });
+        }}>
             <Text style={styles.buttonText}>Log In</Text>
           </TouchableHighlight>
           <TouchableHighlight style={[styles.button, styles.signupButton]}
-            onPress = {() => {this.props.navigator.push({ name : 'signupScreen'})}}>
+            onPress = {() => {this.props.navigator.push({
+              title: "Sign Up",
+              screen: "Parkz.SignupScreen",
+              passProps: { }
+            });
+        }}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableHighlight>
           </View>
@@ -32,6 +43,12 @@ module.exports = class FirstUseScreen extends React.Component {
 )
   }
 }
+
+const mapStateToProps = (state) => ({
+    user : state.user
+})
+
+export default connect(mapStateToProps)(FirstUseScreen)
 
 const styles = StyleSheet.create({
     menuView : {

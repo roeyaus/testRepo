@@ -9,60 +9,46 @@ import {
   Navigator,
   AsyncStorage
 } from 'react-native';
-
+import { connect } from 'react-redux'
 const loggedIn = true
 
-module.exports = class InitialScreen extends React.Component {
+class InitialScreen extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            isLoading : true,
-            currentUser : null
+            stateRestored : false,
+            user : null
         }
     }
 
-    async componentWillMount() {
-        current_user = await this._retrieveUser()
-        //if we have a current_user, navigate to MainScreen, else to FirstUse
-        if (current_user != null)
+ shouldComponentUpdate(nextState,nextProps)
+  {
+    console.log("ComponentWillMount resotred, props : " + JSON.stringify(this.nextProps))
+     if (nextProps.stateRestored)
         {
-            this.props.navigator.push({
-              title: "MainScreen",
-              screen: "Parkz.MainScreen",
-              passProps: { current_user }
-            });
+          
+              this.props.navigator.pop( {
+                animated : false
+              })
+           
+          return false
         }
-        else {
-            this.props.navigator.push({
-              title: "FirstUseScreen",
-              screen: "Parkz.FirstUseScreen",
-              passProps: { current_user }
-            });
-        }
-
-
-    }
-async _retrieveUser() {
-    try {
-        var value = await AsyncStorage.getItem('@Parkz:currentUser');
-        if (value != null){
-            // We have data!!
-        }
-    } catch (error) {
-      // Error retrieving data
-      console.log("error retrieving user : " + error)
-    }
-    console.log("retrieved user : " + value)
-    return value
-}
-  render() {
-    if (this.state.isLoading)
-    {
-        return (
-            <Text>Loading...</Text>
-        )
-    }
+     return true
     //console.log("currentUser : " + JSON.stringify(currentUser))
 
     }
+  
+  render() {
+    return <Text>Loading...</Text>
+  }
 }
+
+export default connect(
+  (state) => {
+    console.log("InitialScreen State change " + JSON.stringify(state))
+     return ({
+       stateRestored : true,
+       user : state.user
+     })
+  }
+)(InitialScreen)
