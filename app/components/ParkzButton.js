@@ -6,32 +6,30 @@ Text,
   TouchableHighlight,
 } from 'react-native';
 
-module.exports = class ParkzButton extends React.Component {
-  render() {
-    return (
-        <TouchableHighlight style={ [ styles.button, 
-        {backgroundColor : 
-          this.props.backgroundColor
-        }]
-        }
-            onPress = {this.props.onPress}>
-          <Text style={styles.buttonText}>{this.props.text}</Text>
+const ParkzButton = ({backgroundColor, onPress, text, buttonStyle, textStyle }) => (
+        <TouchableHighlight style={ [ styles.button, buttonStyle ]  }
+            onPress = {onPress}>
+          <Text style={[ styles.buttonText, textStyle ]}>{text}</Text>
           </TouchableHighlight>
     )
-  }
-}
 
+
+export default ParkzButton
 
 const styles = StyleSheet.create({
-
     button : {
-        width : 80,
         height : 40,
+        width : 100,
         borderRadius : 5,
-        alignItems : "center",
+        alignItems : "stretch",
         justifyContent : "center",
-        marginLeft : 50,
-        marginRight : 50
+         shadowColor: "#000000",
+              shadowRadius: 2,
+              shadowOpacity: 0.5,
+              shadowOffset: {
+                height: 1,
+                width: 1
+              }
     },
     buttonText : {
         textAlign : "center",

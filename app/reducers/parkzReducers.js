@@ -3,8 +3,7 @@ import { SET_CURRENT_USER } from './parkzActions'
 import Immutable from 'seamless-immutable';
 import { REHYDRATE } from 'redux-persist/constants';
 
-const initialState = {
-    user : {
+const initialUser = {
         loggedIn : false,
         firstName : "",
         lastName : "",
@@ -14,21 +13,23 @@ const initialState = {
         paymentMethod : undefined,
         openOrder : undefined,
         orders : []
-    }
 }
 
-function userReducer(state = initialState, action) {
-  console.log("user reducer. state : " + JSON.stringify(state) + ",action : " + JSON.stringify(action))
+function userReducer(user = initialUser, action) {
+  
   switch (action.type) {
     case SET_CURRENT_USER:
-          return Object.assign({}, state, { user : action.user})
+          const newUser = Object.assign({}, user, action.user)
+          newUser.loggedIn = true
+          console.log("user logged in : ", newUser)
+          return newUser
     default:
-      return state
+      return user
   }
 }
 
 const parkzReducer = combineReducers({
-  userReducer
+  user : userReducer
 })
 
 export default parkzReducer

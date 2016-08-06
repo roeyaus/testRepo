@@ -38,10 +38,10 @@ export default class Application  {
     persistStore(store, {storage: AsyncStorage}, () => {
 
       const state = store.getState()
-      console.log("state restored : " + state + ", loading initial screen")
+      console.log("state restored : " , state , ", loading initial screen")
        let screen = ""
        let title = ""
-       if (state.user == null)
+       if (!state.user || !state.user.loggedIn )
         {
           screen = 'Parkz.FirstUseScreen'
           title = 'Hi!'
