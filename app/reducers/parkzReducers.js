@@ -10,9 +10,10 @@ const initialUser = {
         picture : "",
         email : "",
         phone : "",
+        password : "",
         paymentMethod : undefined,
-        openOrder : undefined,
-        orders : []
+        openOrderID : undefined,
+        prevOrderIDs : []
 }
 
 function userReducer(user = initialUser, action) {

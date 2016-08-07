@@ -6,27 +6,18 @@ TextInput,
 Text
 } from 'react-native';
 
-module.exports = class ParkzTextField extends React.Component {
-  render() {
-    return (
+const ParkzTextField = ({leftText, ...props}) => (
       <View style={styles.textInputView}>
-            <Text>{this.props.leftText}</Text>
+            <Text>{leftText}</Text>
             <TextInput
             style={styles.textInputs}
-            onFocus={this.props.onFocus}
-            onChangeText={this.props.onChangeText}
-            placeholder={this.props.placeholder}
-            autoFocus={this.props.autoFocus}
-            returnKeyType={this.props.returnKeyType}
-            borderWidth = {this.props.borderWidth}
-            secureTextEntry={this.props.secureTextEntry}
+            {...props}
             autoCorrect = {false}
               />
         
-        </View>
-    )
-  }
-}
+        </View>)
+
+export default ParkzTextField
 
 const styles = StyleSheet.create({
     textInputView : {

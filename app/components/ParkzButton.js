@@ -6,7 +6,7 @@ Text,
   TouchableHighlight,
 } from 'react-native';
 
-const ParkzButton = ({backgroundColor, onPress, text, buttonStyle, textStyle }) => (
+const ParkzButton = ({ onPress, text, buttonStyle, textStyle }) => (
         <TouchableHighlight style={ [ styles.button, buttonStyle ]  }
             onPress = {onPress}>
           <Text style={[ styles.buttonText, textStyle ]}>{text}</Text>
