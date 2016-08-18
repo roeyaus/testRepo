@@ -33,7 +33,7 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 export default class Application {
   constructor(props) {
     //load the persisted store
-    //persistStore(store, { storage: AsyncStorage }, null).purgeAll()
+   // persistStore(store, { storage: AsyncStorage }, null).purgeAll()
     persistStore(store, { storage: AsyncStorage }, () => {
 
       const state = store.getState()

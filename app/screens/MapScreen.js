@@ -8,22 +8,67 @@ import {
   TouchableHighlight,
   TextInput,
   Button,
-  MapView
+  MapView,
+  Linking,
+  Image,
+  Alert
 } from 'react-native';
+
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import ParkzButton from '../components/ParkzButton'
+import ParkzMyCarView from '../components/ParkzMyCarView'
+import {connect} from 'react-redux'
+import { setOpenOrder } from '../reducers/parkzActions'
 
-
-module.exports = class MapScreen extends React.Component {
+class MapScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       destination: "",
       destLat: 0.0,
       destLong: 0.0,
-      canPlaceOrder: false
+      canPlaceOrder: true,
+      hasWaze : false
     }
   }
+
+  componentWillMount() {
+
+    //get and store current user's location'
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        var initialPosition = JSON.stringify(position);
+        this.setState({ destLat: position.coords.latitude, destLong: position.coords.longitude });
+        console.log(initialPosition)
+      },
+      (error) => alert(error.message),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+
+    //register for user location changes and update the state
+    this.watchID = navigator.geolocation.watchPosition((position) => {
+      var lastPosition = JSON.stringify(position);
+      this.setState({ lastPosition });
+    }, (error) => {
+      console.log(error)
+    }, { distanceFilter: 10 });
+
+    //check if Waze is available
+    Linking.canOpenURL("waze://?ll=0,0&navigate=yes").then(supported => {
+      if (!supported) {
+        console.log('Waze not available')
+      } else {
+        console.log("Waze is available")
+         this.setState({hasWaze : true})
+      }
+    }).catch(err => console.error('An error occurred', err));
+  }
+
+  componentWillUnmount() {
+    navigator.geolocation.clearWatch(this.watchID);
+  }
+
+
   onDrawerButtonClick() {
     console.log("drawer click")
     this.props.navigator.toggleDrawer({
@@ -36,8 +81,9 @@ module.exports = class MapScreen extends React.Component {
 
   //create a new order object
   createOrder(userID) {
-    return {
+    return ({
       serviceZoneID: 0,
+      openOrder: true,
       userID: userID,
       parkValetID: 0,
       returnValetID: 0,
@@ -51,14 +97,14 @@ module.exports = class MapScreen extends React.Component {
       carRequestTime: new Date().toDateString(),
       parkingEndTime: new Date().toDateString(),
       handoffTime: new Date().toDateString(),
-      pickupLocation: "",
+      pickupLocation: { destination: this.state.destination, destLat: this.state.destLat, destLong: this.state.destLong },
       handoffLocation: "",
       totalCost: 0,
       paidCost: 0,
       tip: 0,
       rating: 0,
       comments: ""
-    }
+    })
   }
   // OrderID
   // ServiceZoneID
@@ -91,25 +137,34 @@ module.exports = class MapScreen extends React.Component {
   onOrderPlaced() {
     //update firebase with a new order
     // Get a key for a new Order.
-    const order = createOrder(firebase.auth().currentUser)
-    var newPostKey = firebase.database().ref().child('orders').push().key;
-
-    var updates = {};
-    updates['/posts/' + newPostKey] = postData;
-    updates['/user-posts/' + uid + '/' + newPostKey] = postData;
-
-    return firebase.database().ref().update(updates);
-
+      var _this = this
+      const order = this.createOrder(firebase.auth().currentUser.uid)
+      this.props.placeOrder(order).then(res => {
+        Alert.alert("Order Placed")
+      }).catch(error => {
+        Alert.alert("Order Failed")
+      })
   }
 
   render() {
-    const Button = (<View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <ParkzButton text="Parkz My Car" width={200} onPress={() => { this.onOrderPlaced() } } buttonStyle= { { backgroundColor: "black" }}  />
-    </View>)
+    const ParkzMyCar = (<ParkzMyCarView onPress={() => this.onOrderPlaced()}/>)
 
     return (
       <View style={styles.container}>
-        <MapView style={{ flex: 1 }} showsUserLocation={true} region={{ latitude: this.state.destLat, longitude: this.state.destLong, latitudeDelta: 0.01, longitudeDelta: 0.01 }}>
+        <MapView style={{ flex: 1 }} showsUserLocation={true}  followUserLocation = {true}
+          overlays={[{
+            coordinates: [
+              { latitude: 32.096824, longitude: 34.774748 },
+              { latitude: 32.098860, longitude: 34.801122 },
+              { latitude: 32.069243, longitude: 34.787793 },
+              { latitude: 32.073773, longitude: 34.765000 },
+              { latitude: 32.096824, longitude: 34.774748 },
+            ],
+            strokeColor: '#f007',
+            fillColor: '#f007',
+            lineWidth: 3,
+          }]}
+          >
 
         </MapView>
         <View style = {{
@@ -117,16 +172,17 @@ module.exports = class MapScreen extends React.Component {
           top: 10,
           left: 10, width: 300
         }}>
+      
           <GooglePlacesAutocomplete
             placeholder='Where are you driving to?'
             minLength={2} // minimum length of text to search 
-            autoFocus={false}
+            autoFocus={true}
             fetchDetails={true}
             enablePoweredByContainer = {false}
             onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true 
               console.log(data);
               console.log(details);
-              console.log(details.geometry.location.lat, ",", details.geometry.location.long)
+              console.log(details.geometry.location.lat, ",", details.geometry.location.lng)
               this.setState({ destination: data.description, destLat: details.geometry.location.lat, destLong: details.geometry.location.lng })
             } }
             getDefaultValue={() => {
@@ -163,8 +219,11 @@ module.exports = class MapScreen extends React.Component {
             />
 
         </View>
-        {this.state.canPlaceOrder && Button}
-
+        <View style= {{bottom : 0, position : 'absolute', alignItems : 'stretch'}}>
+        
+        {this.state.canPlaceOrder && ParkzMyCar}
+        </View>
+       
       </View>
     );
   }
@@ -179,3 +238,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   }
 });
+
+
+
+const mapDispatchToProps = (dispatch) => ({
+    placeOrder : order => dispatch(setOpenOrder(order))
+})
+
+export default connect(null, mapDispatchToProps)(MapScreen)
