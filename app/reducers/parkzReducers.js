@@ -46,7 +46,7 @@ const initialOrder = {
       carRequestTime: new Date().toDateString(),
       parkingEndTime: new Date().toDateString(),
       handoffTime: new Date().toDateString(),
-      pickupLocation: { destination: "" , destLat: "", destLong: ""},
+      pickupLocation: null,
       handoffLocation: "",
       totalCost: 0,
       paidCost: 0,
@@ -87,6 +87,7 @@ const initialValetData = {
 
 function valetDataReducer(valetData = initialValetData, action) {
     if (action.type == SET_VALET_DATA) {
+      console.log("action.valetData : ", action.valetData, "valetData : ", valetData)
       const newValetData = Object.assign({}, valetData, action.valetData)
       console.log("valet data updated : ", newValetData)
       return newValetData

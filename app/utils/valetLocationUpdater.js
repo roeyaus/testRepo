@@ -16,10 +16,12 @@ export function updateUserLocation(location) {
 const onValetValueChange = (value) => {
     let valet = value.val()[Object.keys(value.val())[0]]
 
-    console.log(valet)
+    console.log("value.val " ,value.val())
     console.log(_userLocation)
-     var url = "http://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + _userLocation.latitude +
-            "," + _userLocation.longitude + "&mode=walking" + "&destinations=" + valet.location.latitude + "," + valet.location.longitude
+    let destLat = _store.order && _store.order.pickupLocation ? _store.order.pickupLocation.latitude : _userLocation.latitude
+    let destLong = _store.order && _store.order.pickupLocation ? _store.order.pickupLocation.longitude : _userLocation.longitude
+     var url = "http://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + destLat +
+            "," + destLong + "&mode=walking" + "&destinations=" + valet.location.latitude + "," + valet.location.longitude
         console.log(url)
         fetch(url, {method : "post"}) //gets all public car parks (free or not)
         .then((response) => response.json())
@@ -31,7 +33,7 @@ const onValetValueChange = (value) => {
                 {
                     valet.etaInMinutes = Math.ceil(data.rows[0].elements[0].duration.value / (60 * valet["isWalking"] ? 1 : 2))
                 }
-                _store.dispatch(setValetData(valet))
+                _store.dispatch(setValetData(value.val()))
         }).catch(function(error)
         {
             console.log(error)

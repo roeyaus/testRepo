@@ -34,6 +34,7 @@ export default class Application {
   constructor(props) {
     //load the persisted store
     persistStore(store, { storage: AsyncStorage }, null).purge(['order'])
+    persistStore(store, { storage: AsyncStorage }, null).purge(['valetData'])
     persistStore(store, { storage: AsyncStorage }, () => {
 
       const state = store.getState()
