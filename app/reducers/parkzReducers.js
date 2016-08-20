@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { SET_CURRENT_USER, SET_ORDER } from './parkzActions'
+import { SET_CURRENT_USER, SET_ORDER, SET_VALET_DATA } from './parkzActions'
 import Immutable from 'seamless-immutable';
 import { REHYDRATE } from 'redux-persist/constants';
 
@@ -30,6 +30,7 @@ function userReducer(user = initialUser, action) {
 }
 
 const initialOrder = {
+      orderID : "",
       serviceZoneID: 0,
       openOrder: false,
       userID: "",
@@ -66,10 +67,30 @@ function orderReducer(order = initialOrder, action) {
   }
 }
 
+const initialValetData = {
+    "valet0" : {
+      firstName : "Roey",
+      lastName : "L",
+      location : {
+        latitude : 32.09001,
+        longitude : 34.77771
+      }
+    }
+} 
+
+function valetDataReducer(valetData = initialValetData, action) {
+    if (action.type == SET_VALET_DATA) {
+      const newValetData = Object.assign({}, valetData, action.valetData)
+      console.log("valet data updated : ", newValetData)
+      return newValetData
+    }
+    return valetData
+}
 
 const parkzReducer = combineReducers({
   user : userReducer,
-  order : orderReducer
+  order : orderReducer,
+  valetData : valetDataReducer
 })
 
 export default parkzReducer

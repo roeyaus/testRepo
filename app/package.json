@@ -10,6 +10,8 @@
     "react": "^15.2.1",
     "react-native": "0.29.0",
     "react-native-google-places-autocomplete": "^1.2.0",
+    "react-native-maps": "^0.7.1",
+    "react-native-maps-google": "^1.1.4",
     "react-native-navigation": "^1.0.28",
     "react-native-side-menu": "^0.19.0",
     "react-redux": "^4.4.5",

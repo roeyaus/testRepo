@@ -7,7 +7,7 @@ var { AsyncStorage } = require('react-native')
 import { compose } from 'redux'
 import { persistStore, autoRehydrate } from 'redux-persist'
 import parkzReducer from './reducers/parkzReducers'
-
+import {registerForValetLocationUpdates, unregisterForValetLocationUpdates} from './utils/valetLocationUpdater.js'
 const store = createStore(parkzReducer, {}, compose(
   applyMiddleware(thunk),
   autoRehydrate()
@@ -38,6 +38,7 @@ export default class Application {
 
       const state = store.getState()
       console.log("state restored : ", state, ", loading initial screen")
+      registerForValetLocationUpdates(store) //init the util that will update the store with valet data
       var screen = "Parkz.FirstUseScreen"
       var title = "Hi!"
       if (!state.user || !state.user.loggedIn) {

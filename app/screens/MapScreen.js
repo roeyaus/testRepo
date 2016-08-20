@@ -8,7 +8,6 @@ import {
   TouchableHighlight,
   TextInput,
   Button,
-  MapView,
   Linking,
   Image,
   Alert
@@ -18,17 +17,20 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import ParkzButton from '../components/ParkzButton'
 import ParkzMyCarView from '../components/ParkzMyCarView'
 import {connect} from 'react-redux'
-import { setOpenOrder } from '../reducers/parkzActions'
+import { setOpenOrder, setUserLocation } from '../reducers/parkzActions'
+import MapView from 'react-native-maps'
 
 class MapScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      currentLocation : {},
       destination: "",
       destLat: 0.0,
       destLong: 0.0,
       canPlaceOrder: true,
-      hasWaze : false
+      hasWaze : false,
+      valetData : []
     }
   }
 
@@ -47,8 +49,9 @@ class MapScreen extends React.Component {
 
     //register for user location changes and update the state
     this.watchID = navigator.geolocation.watchPosition((position) => {
-      var lastPosition = JSON.stringify(position);
-      this.setState({ lastPosition });
+      console.log(position.coords)
+      this.setState({currentLocation : position.coords});
+      this.props.updateLocation(position.coords)
     }, (error) => {
       console.log(error)
     }, { distanceFilter: 10 });
@@ -82,23 +85,21 @@ class MapScreen extends React.Component {
   //create a new order object
   createOrder(userID) {
     return ({
-      serviceZoneID: 0,
+      serviceZoneID: "",
       openOrder: true,
       userID: userID,
-      parkValetID: 0,
-      returnValetID: 0,
-      carModel: "",
-      carColor: "",
+      parkValetID: "",
+      returnValetID: "",
       carCode: "",
-      licensePlateNumber: 0,
+      licensePlateNumber: "",
       orderTime: new Date().toDateString(),
       pickupTime: new Date().toDateString(), //need to change to actual time
       parkingStartTime: new Date().toDateString(),
       carRequestTime: new Date().toDateString(),
       parkingEndTime: new Date().toDateString(),
       handoffTime: new Date().toDateString(),
-      pickupLocation: { destination: this.state.destination, destLat: this.state.destLat, destLong: this.state.destLong },
-      handoffLocation: "",
+      pickupLocation: { destination: this.state.destination, latitude: this.state.destLat, longitude: this.state.destLong },
+      handoffLocation: { destination : "", latitude : 0.0, longitude : 0.0 },
       totalCost: 0,
       paidCost: 0,
       tip: 0,
@@ -151,21 +152,27 @@ class MapScreen extends React.Component {
 
     return (
       <View style={styles.container}>
-        <MapView style={{ flex: 1 }} showsUserLocation={true}  followUserLocation = {true}
-          overlays={[{
-            coordinates: [
+        <MapView style={{ flex: 1 }} showsUserLocation={true}  followsUserLocation = {true} showsCompass={false}>
+        <MapView.Polygon
+            coordinates = { [
               { latitude: 32.096824, longitude: 34.774748 },
               { latitude: 32.098860, longitude: 34.801122 },
               { latitude: 32.069243, longitude: 34.787793 },
               { latitude: 32.073773, longitude: 34.765000 },
               { latitude: 32.096824, longitude: 34.774748 },
-            ],
-            strokeColor: '#f007',
-            fillColor: '#f007',
-            lineWidth: 3,
-          }]}
-          >
-
+            ]}
+            strokeColor= '#f007'
+            fillColor= '#f007'
+            strokeWidth = {3}
+          />
+          {this.props.valetData.map(valet => (
+              <MapView.Marker
+                key = {valet.firstName}
+                coordinate={valet.location}
+                title={valet.firstName}
+                //image={require('../assets/images/waze_icon.png')}
+              />
+            ))}
         </MapView>
         <View style = {{
           flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', position: 'absolute',
@@ -242,7 +249,12 @@ const styles = StyleSheet.create({
 
 
 const mapDispatchToProps = (dispatch) => ({
-    placeOrder : order => dispatch(setOpenOrder(order))
+    placeOrder : order => dispatch(setOpenOrder(order)),
+    updateLocation : location => dispatch(setUserLocation(location))
 })
 
-export default connect(null, mapDispatchToProps)(MapScreen)
+const mapStateToProps = (state) => ({
+    valetData : Object.keys(state.valetData).map(key => state.valetData[key])
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapScreen)
