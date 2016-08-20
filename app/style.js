@@ -8,8 +8,11 @@ var {
 
 module.exports = StyleSheet.create({
 
-ptext : {
-    
+overlayViewStyle : {
+    flexDirection : 'column' ,
+    justifyContent : 'space-around',  
+    backgroundColor:'rgba(255,255,255,0.8)', 
+    alignItems : 'center'
 }
 
 });

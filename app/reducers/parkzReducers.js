@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
-import { SET_CURRENT_USER, SET_ORDER, SET_VALET_DATA } from './parkzActions'
+import { SET_CURRENT_USER, SET_ORDER, SET_VALET_DATA, CANCEL_ORDER } from './parkzActions'
 import Immutable from 'seamless-immutable';
 import { REHYDRATE } from 'redux-persist/constants';
-
+import { orderStatusEnum } from '../utils/enums.js'
 const initialUser = {
         loggedIn : false,
         firstName : "",
@@ -32,9 +32,9 @@ function userReducer(user = initialUser, action) {
 const initialOrder = {
       orderID : "",
       serviceZoneID: 0,
-      openOrder: false,
+      orderStatus : orderStatusEnum.none,
       userID: "",
-      parkValetID: 0,
+      parkValetID: "valet01",
       returnValetID: 0,
       carModel: "",
       carColor: "",
@@ -59,10 +59,16 @@ function orderReducer(order = initialOrder, action) {
   switch (action.type) {
     case SET_ORDER:
       const newOrder = Object.assign({}, order, action.order)
-      newOrder.openOrder = true
+      newOrder.orderStatus = orderStatusEnum.open
       console.log("order placed : ", newOrder)
       return newOrder
+    case CANCEL_ORDER:
+      const cancelledOrder = Object.assign({}, order, action.order) 
+      cancelledOrder.orderStatus = orderStatusEnum.cancelled
+      console.log("order cancelled : ", cancelledOrder)
+      return cancelledOrder
     default : 
+    console.log(order)
     return order
   }
 }
@@ -73,8 +79,9 @@ const initialValetData = {
       lastName : "L",
       location : {
         latitude : 32.09001,
-        longitude : 34.77771
-      }
+        longitude : 34.77775
+      },
+      etaInMinutes : 0
     }
 } 
 

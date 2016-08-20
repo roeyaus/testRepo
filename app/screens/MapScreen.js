@@ -16,21 +16,29 @@ import {
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import ParkzButton from '../components/ParkzButton'
 import ParkzMyCarView from '../components/ParkzMyCarView'
+import PickupValetView from '../components/PickupValetView'
 import {connect} from 'react-redux'
-import { setOpenOrder, setUserLocation } from '../reducers/parkzActions'
+import { setOpenOrder, setUserLocation, setCancelOrder } from '../reducers/parkzActions'
 import MapView from 'react-native-maps'
-
+import { orderStatusEnum } from '../utils/enums.js'
+import {updateUserLocation} from '../utils/valetLocationUpdater.js'
 class MapScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      currentLocation : {},
+      currentLocation: {},
       destination: "",
+      region : {
+         latitude : 0,
+         longitude : 0,
+         latitudeDelta: 0.00922,
+         longitudeDelta: 0.00421,
+      },
       destLat: 0.0,
       destLong: 0.0,
       canPlaceOrder: true,
-      hasWaze : false,
-      valetData : []
+      hasWaze: false,
+      valetData: []
     }
   }
 
@@ -40,7 +48,8 @@ class MapScreen extends React.Component {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         var initialPosition = JSON.stringify(position);
-        this.setState({ destLat: position.coords.latitude, destLong: position.coords.longitude });
+        this.setState({ region : { latitude : position.coords.latitude, longitude : position.coords.longitude,
+          latitudeDelta : this.state.region.latitudeDelta, longitudeDelta : this.state.region.longitudeDelta } });
         console.log(initialPosition)
       },
       (error) => alert(error.message),
@@ -50,8 +59,12 @@ class MapScreen extends React.Component {
     //register for user location changes and update the state
     this.watchID = navigator.geolocation.watchPosition((position) => {
       console.log(position.coords)
-      this.setState({currentLocation : position.coords});
+      this.setState({ currentLocation: position.coords, region : { latitude : position.coords.latitude, longitude : position.coords.longitude,
+        latitudeDelta : this.state.region.latitudeDelta, longitudeDelta : this.state.region.longitudeDelta }});
       this.props.updateLocation(position.coords)
+
+      //we update the valetLocation manager with user's location so we can get eta calculations
+      updateUserLocation({ latitude : position.coords.latitude, longitude : position.coords.longitude})
     }, (error) => {
       console.log(error)
     }, { distanceFilter: 10 });
@@ -62,7 +75,7 @@ class MapScreen extends React.Component {
         console.log('Waze not available')
       } else {
         console.log("Waze is available")
-         this.setState({hasWaze : true})
+        this.setState({ hasWaze: true })
       }
     }).catch(err => console.error('An error occurred', err));
   }
@@ -86,9 +99,9 @@ class MapScreen extends React.Component {
   createOrder(userID) {
     return ({
       serviceZoneID: "",
-      openOrder: true,
+      orderStatus : orderStatusEnum.none,
       userID: userID,
-      parkValetID: "",
+      parkValetID: "valet01",
       returnValetID: "",
       carCode: "",
       licensePlateNumber: "",
@@ -98,8 +111,8 @@ class MapScreen extends React.Component {
       carRequestTime: new Date().toDateString(),
       parkingEndTime: new Date().toDateString(),
       handoffTime: new Date().toDateString(),
-      pickupLocation: { destination: this.state.destination, latitude: this.state.destLat, longitude: this.state.destLong },
-      handoffLocation: { destination : "", latitude : 0.0, longitude : 0.0 },
+      pickupLocation: { destination: this.state.destination, latitude: this.state.region.latitude, longitude: this.state.region.longitude },
+      handoffLocation: { destination: "", latitude: 0.0, longitude: 0.0 },
       totalCost: 0,
       paidCost: 0,
       tip: 0,
@@ -138,23 +151,39 @@ class MapScreen extends React.Component {
   onOrderPlaced() {
     //update firebase with a new order
     // Get a key for a new Order.
-      var _this = this
-      const order = this.createOrder(firebase.auth().currentUser.uid)
-      this.props.placeOrder(order).then(res => {
-        Alert.alert("Order Placed")
-      }).catch(error => {
-        Alert.alert("Order Failed")
+    var _this = this
+    const order = this.createOrder(firebase.auth().currentUser.uid)
+    this.props.placeOrder(order).then(res => {
+      //Alert.alert("Order Placed")
+    }).catch(error => {
+      Alert.alert("Sorry, something went wrong")
+    })
+  }
+  //redraw our marker in the middle of the map
+  onRegionChange(region) {
+    //console.log(region)
+   // this.setState({region})
+  }
+
+  onOrderCancelled() {
+      this.props.cancelOrder(this.props.order).then(function(res) {
+          //order has been cancelled
+      }).catch(function(error){
+        Alert.alert("Sorry, something went wrong")
       })
   }
 
   render() {
-    const ParkzMyCar = (<ParkzMyCarView onPress={() => this.onOrderPlaced()}/>)
-
+    const ParkzMyCar = (<ParkzMyCarView onPress={() => this.onOrderPlaced() }/>)
+    const PickupValet = (<PickupValetView onCancel={() => this.onOrderCancelled()}/>)
     return (
       <View style={styles.container}>
-        <MapView style={{ flex: 1 }} showsUserLocation={true}  followsUserLocation = {true} showsCompass={false}>
-        <MapView.Polygon
-            coordinates = { [
+        <MapView ref="mapView" style={{ flex: 1 }} showsUserLocation={true}  followsUserLocation = {true} showsCompass={false}
+          region = {this.state.region}
+          onRegionChange={(region) => this.onRegionChange(region)}
+          >
+          <MapView.Polygon
+            coordinates = {[
               { latitude: 32.096824, longitude: 34.774748 },
               { latitude: 32.098860, longitude: 34.801122 },
               { latitude: 32.069243, longitude: 34.787793 },
@@ -164,44 +193,80 @@ class MapScreen extends React.Component {
             strokeColor= '#f007'
             fillColor= '#f007'
             strokeWidth = {3}
-          />
+            />
+          <MapView.Marker key="centerMarker" coordinate={{ latitude: this.state.region.latitude, longitude: this.state.region.longitude }} />
           {this.props.valetData.map(valet => (
-              <MapView.Marker
-                key = {valet.firstName}
-                coordinate={valet.location}
-                title={valet.firstName}
-                //image={require('../assets/images/waze_icon.png')}
+            <MapView.Marker
+              key = {valet.firstName}
+              coordinate={valet.location}
+              title={valet.firstName}
+              //image={require('../assets/images/waze_icon.png')}
               />
-            ))}
+          )) }
         </MapView>
         <View style = {{
           flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', position: 'absolute',
           top: 10,
           left: 10, width: 300
         }}>
-      
+
           <GooglePlacesAutocomplete
             placeholder='Where are you driving to?'
+            textInputProps={{
+              autoCorrect : false
+            }}
             minLength={2} // minimum length of text to search 
-            autoFocus={true}
+            // autoFocus={true}
             fetchDetails={true}
             enablePoweredByContainer = {false}
             onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true 
               console.log(data);
               console.log(details);
               console.log(details.geometry.location.lat, ",", details.geometry.location.lng)
-              this.setState({ destination: data.description, destLat: details.geometry.location.lat, destLong: details.geometry.location.lng })
+              this.setState({ destination: data.description, region : { latitude : details.geometry.location.lat, longitude: details.geometry.location.lng,
+                 latitudeDelta : this.state.region.latitudeDelta, longitudeDelta : this.state.region.longitudeDelta }})
             } }
             getDefaultValue={() => {
               return ''; // text input default value 
             } }
             query={{
               // available options: https://developers.google.com/places/web-service/autocomplete 
-              key: 'AIzaSyDheVyleROsqoQR7L6x8bFfMX-MZD12GUc',
+              key: 'AIzaSyCMJpcMKtuafU2buTcPb1T0jBym-hovsy8',
               language: 'en' // language of the results 
               //types: '(cities)', // default: 'geocode' 
             }}
             styles={{
+              listView: {
+                backgroundColor: 'white',
+                borderRadius: 10,
+                shadowColor: "#000000",
+                shadowOpacity: 0.8,
+                shadowRadius: 2,
+                shadowOffset: {
+                  height: 1,
+                  width: 0
+                }
+              },
+              separator: {
+                height: 0
+              },
+              textInputContainer: {
+                backgroundColor: 'transparent',
+                borderTopWidth: 0,
+                borderBottomWidth: 0
+              },
+              textInput: {
+                height: 40,
+                borderRadius: 10,
+                borderWidth: 2,
+                shadowColor: "#000000",
+                shadowOpacity: 0.8,
+                shadowRadius: 10,
+                shadowOffset: {
+                  height: 5,
+                  width: 5
+                }
+              },
               description: {
                 fontWeight: 'bold',
               },
@@ -212,25 +277,24 @@ class MapScreen extends React.Component {
 
             currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list 
             currentLocationLabel="My current location"
-            nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch 
+            nearbyPlacesAPI='GoogleReverseGeocoding' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch 
             GoogleReverseGeocodingQuery={{
               // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro 
+              latitude : this.state.region.latitude,
+              longitude : this.state.region.longitude,
+              key: 'AIzaSyCMJpcMKtuafU2buTcPb1T0jBym-hovsy8'
             }}
             GooglePlacesSearchQuery={{
               // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search 
-              rankby: 'distance',
-              types: 'food',
             }}
 
 
             />
 
         </View>
-        <View style= {{bottom : 0, position : 'absolute', alignItems : 'stretch'}}>
-        
-        {this.state.canPlaceOrder && ParkzMyCar}
+        <View position='absolute' bottom = {0} left = {0} right={0} alignSelf = 'stretch' >
+        { (this.props.order.orderStatus == orderStatusEnum.open && PickupValet) || (this.state.destination != "" && this.state.canPlaceOrder && ParkzMyCar)}
         </View>
-       
       </View>
     );
   }
@@ -249,12 +313,14 @@ const styles = StyleSheet.create({
 
 
 const mapDispatchToProps = (dispatch) => ({
-    placeOrder : order => dispatch(setOpenOrder(order)),
-    updateLocation : location => dispatch(setUserLocation(location))
+  placeOrder: order => dispatch(setOpenOrder(order)),
+  updateLocation: location => dispatch(setUserLocation(location)),
+  cancelOrder : order => dispatch(setCancelOrder(order))
 })
 
 const mapStateToProps = (state) => ({
-    valetData : Object.keys(state.valetData).map(key => state.valetData[key])
+  valetData: Object.keys(state.valetData).map(key => state.valetData[key]),
+  order : state.order
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapScreen)

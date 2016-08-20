@@ -1,3 +1,5 @@
+
+import { orderStatusEnum } from '../utils/enums.js'
 /*
  * action types
  */
@@ -5,6 +7,7 @@
 export const SET_CURRENT_USER = 'SET_CURRENT_USER'
 export const SET_ORDER = 'SET_ORDER'
 export const SET_VALET_DATA = 'SET_VALET_DATA'
+export const CANCEL_ORDER = 'CANCEL_ORDER'
 /*
  * action creators
  */
@@ -15,6 +18,9 @@ export function setCurrentUser(user) {
 
 export function setCurrentOrder(order) {
   return { type: SET_ORDER, order }
+}
+export function cancelOrder(order) {
+return { type: CANCEL_ORDER, order }
 }
 
 export function setValetData(valetData) {
@@ -31,11 +37,30 @@ export function setUserLocation(location) {
         console.log("updated firebase with user location")
         res()
       }).catch(error => {
-        console.log("faild to place order! DB error : ", error)
+        console.log("faild to update location : ", error)
         rej()
       })
     })
   }
+}
+
+export function setCancelOrder(order) {
+    return function (dispatch, getState) {
+      var updates = {}
+      updates['/orders/' + order.orderID + '/orderStatus'] = orderStatusEnum.cancelled;
+      updates['/open-orders-by-user/' + firebase.auth().currentUser.uid + '/' + order.orderID] = null
+      return new Promise(function (res, rej) {
+      firebase.database().ref().update(updates).then(() => {
+        //DB update was OK, now update our global state
+        console.log("updated firebase with cancelled order")
+        dispatch(cancelOrder(order))
+        res()
+      }).catch(error => {
+        console.log("faild to cancel order! DB error : ", error)
+        rej()
+      })
+    })
+    }
 }
 
 //this opens a new order in firebase, then continues to the reducer to update the state
