@@ -1,46 +1,32 @@
 import {setValetData} from '../reducers/parkzActions.js'
-var _store = null
-var _userLocation = {
-    latitude : 0,
-    longitude : 0
-}
-export function registerForValetLocationUpdates(store) {
-    _store = store
-    firebase.database().ref('/valets/').on('value', onValetValueChange);
-}
 
-export function updateUserLocation(location) {
-    _userLocation = location
-}
 
-const onValetValueChange = (value) => {
-    let valet = value.val()[Object.keys(value.val())[0]]
-
-    console.log("value.val " ,value.val())
-    console.log(_userLocation)
-    let destLat = _store.order && _store.order.pickupLocation ? _store.order.pickupLocation.latitude : _userLocation.latitude
-    let destLong = _store.order && _store.order.pickupLocation ? _store.order.pickupLocation.longitude : _userLocation.longitude
-     var url = "http://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + destLat +
-            "," + destLong + "&mode=walking" + "&destinations=" + valet.location.latitude + "," + valet.location.longitude
+//return a promise to get the ETA
+//transport mode is a string ("walking", "driving", etc.)
+export function asyncGetETA(originLocation, destLocation, transportMode = "walking") {
+    return new Promise(function (res, rej) {
+        let eta = 0
+        const url = "http://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + originLocation.latitude +
+            "," + originLocation.longitude + "&mode=" + transportMode + "&destinations=" + destLocation.latitude + "," + destLocation.longitude
         console.log(url)
-        fetch(url, {method : "post"}) //gets all public car parks (free or not)
-        .then((response) => response.json())
-        .then((data) => {
-            console.log("google's response : ", data)
-            //iterate over google's response and add distance to our carPark array
-                console.log(JSON.stringify(data.rows[0].elements[0]))
-                if (data.rows[0].elements[0].status == "OK")
-                {
-                    valet.etaInMinutes = Math.ceil(data.rows[0].elements[0].duration.value / (60 * valet["isWalking"] ? 1 : 2))
+        fetch(url, { method: "get" })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("google's response : ", data)
+                if (data.rows[0].elements[0].status == "OK") {
+                    eta = Math.ceil(data.rows[0].elements[0].duration.value / 60)
                 }
-                _store.dispatch(setValetData(value.val()))
-        }).catch(function(error)
-        {
-            console.log(error)
-        })
-    
+                res(eta)
+                
+            }).catch(function (error) {
+                console.log(error)
+                rej(error)
+            })
+    })
+    //let destLat = _store.order && _store.order.pickupLocation ? _store.order.pickupLocation.latitude : _userLocation.latitude
+    // let destLong = _store.order && _store.order.pickupLocation ? _store.order.pickupLocation.longitude : _userLocation.longitude
+
+
 }
 
-export function unregisterForValetLocationUpdates() {
-    firebase.database().ref('/valets/').off('value', onValetValueChange);
-}
+

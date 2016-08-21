@@ -44,11 +44,36 @@ export function setUserLocation(location) {
   }
 }
 
+export function startListenToValetFBEvents() {
+  return function (dispatch, getState) {
+    firebase.database().ref('/valets/').on('value', (data) => {
+      dispatch(setValetData(data.val()))
+    });
+  }
+}
+
+export function startListenToOrderFBEvents() {
+  return function (dispatch, getState) {
+    try
+    {
+         firebase.database().ref('/orders/' + getState().order.orderID).on('value', (data) => {
+      dispatch(setCurrentOrder(data.val()))
+    });
+    }
+    catch(error)
+    {
+      console.log(error)
+    }
+ 
+  }
+}
+
 export function setCancelOrder(order) {
     return function (dispatch, getState) {
       var updates = {}
       updates['/orders/' + order.orderID + '/orderStatus'] = orderStatusEnum.cancelled;
       updates['/open-orders-by-user/' + firebase.auth().currentUser.uid + '/' + order.orderID] = null
+      updates['/open-orders-by-valet/']
       return new Promise(function (res, rej) {
       firebase.database().ref().update(updates).then(() => {
         //DB update was OK, now update our global state
@@ -72,12 +97,13 @@ export function setOpenOrder(order) {
     var updates = {};
     updates['/orders/' + newOrderKey] = order;
     updates['/user-orders/' + firebase.auth().currentUser.uid + '/' + newOrderKey] = true
-    updates['/open-orders-by-user/' + firebase.auth().currentUser.uid + '/' + newOrderKey] = true
     order.orderID = newOrderKey
+    order.orderStatus = orderStatusEnum.open
     return new Promise(function (res, rej) {
       firebase.database().ref().update(updates).then(() => {
         //DB update was OK, now update our global state
         console.log("updated firebase with new order")
+        
         dispatch(setCurrentOrder(order))
         res()
       }).catch(error => {

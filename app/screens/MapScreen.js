@@ -18,10 +18,10 @@ import ParkzButton from '../components/ParkzButton'
 import ParkzMyCarView from '../components/ParkzMyCarView'
 import PickupValetView from '../components/PickupValetView'
 import {connect} from 'react-redux'
-import { setOpenOrder, setUserLocation, setCancelOrder } from '../reducers/parkzActions'
+import { setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents , startListenToOrderFBEvents } from '../reducers/parkzActions'
 import MapView from 'react-native-maps'
 import { orderStatusEnum } from '../utils/enums.js'
-import {updateUserLocation} from '../utils/valetLocationUpdater.js'
+import { asyncGetETA} from '../utils/valetLocationUpdater.js'
 class MapScreen extends React.Component {
   constructor(props) {
     super(props)
@@ -63,8 +63,6 @@ class MapScreen extends React.Component {
         latitudeDelta : this.state.region.latitudeDelta, longitudeDelta : this.state.region.longitudeDelta }});
       this.props.updateLocation(position.coords)
 
-      //we update the valetLocation manager with user's location so we can get eta calculations
-      updateUserLocation({ latitude : position.coords.latitude, longitude : position.coords.longitude})
     }, (error) => {
       console.log(error)
     }, { distanceFilter: 10 });
@@ -78,6 +76,8 @@ class MapScreen extends React.Component {
         this.setState({ hasWaze: true })
       }
     }).catch(err => console.error('An error occurred', err));
+
+    this.props.startListenValetUpdates()
   }
 
   componentWillUnmount() {
@@ -97,6 +97,11 @@ class MapScreen extends React.Component {
 
   //create a new order object
   createOrder(userID) {
+    const parkValetID = "valet01" //Who is the parking valet?
+    const returnValetID = "valet01" //who is the returning valet?
+    const pickupLocation = { destination: this.state.destination, latitude: this.state.region.latitude, longitude: this.state.region.longitude }
+    const parkValet = this.props.valetData.filter((valet) => valet.id == parkValetID)
+
     return ({
       serviceZoneID: "",
       orderStatus : orderStatusEnum.none,
@@ -111,13 +116,14 @@ class MapScreen extends React.Component {
       carRequestTime: new Date().toDateString(),
       parkingEndTime: new Date().toDateString(),
       handoffTime: new Date().toDateString(),
-      pickupLocation: { destination: this.state.destination, latitude: this.state.region.latitude, longitude: this.state.region.longitude },
+      pickupLocation: pickupLocation,
       handoffLocation: { destination: "", latitude: 0.0, longitude: 0.0 },
       totalCost: 0,
       paidCost: 0,
       tip: 0,
       rating: 0,
-      comments: ""
+      comments: "",
+      valetETAInMinutes : 0
     })
   }
   // OrderID
@@ -154,6 +160,7 @@ class MapScreen extends React.Component {
     var _this = this
     const order = this.createOrder(firebase.auth().currentUser.uid)
     this.props.placeOrder(order).then(res => {
+      this.props.startListenOrderUpdates()
       //Alert.alert("Order Placed")
     }).catch(error => {
       Alert.alert("Sorry, something went wrong")
@@ -315,7 +322,9 @@ const styles = StyleSheet.create({
 const mapDispatchToProps = (dispatch) => ({
   placeOrder: order => dispatch(setOpenOrder(order)),
   updateLocation: location => dispatch(setUserLocation(location)),
-  cancelOrder : order => dispatch(setCancelOrder(order))
+  cancelOrder : order => dispatch(setCancelOrder(order)),
+  startListenValetUpdates : () => dispatch(startListenToValetFBEvents()),
+  startListenOrderUpdates : () => dispatch(startListenToOrderFBEvents())
 })
 
 const mapStateToProps = (state) => ({

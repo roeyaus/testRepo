@@ -52,15 +52,15 @@ const initialOrder = {
       paidCost: 0,
       tip: 0,
       rating: 0,
-      comments: ""
+      comments: "",
+      valetETAInMinutes : 0
 }
 
 function orderReducer(order = initialOrder, action) {
   switch (action.type) {
     case SET_ORDER:
       const newOrder = Object.assign({}, order, action.order)
-      newOrder.orderStatus = orderStatusEnum.open
-      console.log("order placed : ", newOrder)
+      console.log("setOrder : ", newOrder)
       return newOrder
     case CANCEL_ORDER:
       const cancelledOrder = Object.assign({}, order, action.order) 
@@ -68,21 +68,13 @@ function orderReducer(order = initialOrder, action) {
       console.log("order cancelled : ", cancelledOrder)
       return cancelledOrder
     default : 
-    console.log(order)
+    console.log("init order ",order)
     return order
   }
 }
 
 const initialValetData = {
-    "valet0" : {
-      firstName : "Roey",
-      lastName : "L",
-      location : {
-        latitude : 32.09001,
-        longitude : 34.77775
-      },
-      etaInMinutes : 0
-    }
+
 } 
 
 function valetDataReducer(valetData = initialValetData, action) {

@@ -39,7 +39,6 @@ export default class Application {
 
       const state = store.getState()
       console.log("state restored : ", state, ", loading initial screen")
-      registerForValetLocationUpdates(store) //init the util that will update the store with valet data
       var screen = "Parkz.FirstUseScreen"
       var title = "Hi!"
       if (!state.user || !state.user.loggedIn) {
