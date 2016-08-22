@@ -47,7 +47,8 @@ const initialOrder = {
       parkingEndTime: new Date().toDateString(),
       handoffTime: new Date().toDateString(),
       pickupLocation: null,
-      handoffLocation: "",
+      parkingLocation: null,
+      handoffLocation: null,
       totalCost: 0,
       paidCost: 0,
       tip: 0,
@@ -63,8 +64,7 @@ function orderReducer(order = initialOrder, action) {
       console.log("setOrder : ", newOrder)
       return newOrder
     case CANCEL_ORDER:
-      const cancelledOrder = Object.assign({}, order, action.order) 
-      cancelledOrder.orderStatus = orderStatusEnum.cancelled
+      const cancelledOrder = Object.assign({}, order, action.order)
       console.log("order cancelled : ", cancelledOrder)
       return cancelledOrder
     default : 

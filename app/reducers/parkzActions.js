@@ -19,9 +19,6 @@ export function setCurrentUser(user) {
 export function setCurrentOrder(order) {
   return { type: SET_ORDER, order }
 }
-export function cancelOrder(order) {
-return { type: CANCEL_ORDER, order }
-}
 
 export function setValetData(valetData) {
   return { type: SET_VALET_DATA, valetData }
@@ -74,11 +71,12 @@ export function setCancelOrder(order) {
       updates['/orders/' + order.orderID + '/orderStatus'] = orderStatusEnum.cancelled;
       updates['/open-orders-by-user/' + firebase.auth().currentUser.uid + '/' + order.orderID] = null
       updates['/open-orders-by-valet/']
+      order.orderStatus = orderStatusEnum.none //return state to no order
       return new Promise(function (res, rej) {
       firebase.database().ref().update(updates).then(() => {
         //DB update was OK, now update our global state
         console.log("updated firebase with cancelled order")
-        dispatch(cancelOrder(order))
+        dispatch(setCurrentOrder(order))
         res()
       }).catch(error => {
         console.log("faild to cancel order! DB error : ", error)

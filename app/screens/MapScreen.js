@@ -17,11 +17,13 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import ParkzButton from '../components/ParkzButton'
 import ParkzMyCarView from '../components/ParkzMyCarView'
 import PickupValetView from '../components/PickupValetView'
+import ReturnMyCarView from '../components/ReturnMyCarView'
 import {connect} from 'react-redux'
 import { setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents , startListenToOrderFBEvents } from '../reducers/parkzActions'
 import MapView from 'react-native-maps'
 import { orderStatusEnum } from '../utils/enums.js'
 import { asyncGetETA} from '../utils/valetLocationUpdater.js'
+
 class MapScreen extends React.Component {
   constructor(props) {
     super(props)
@@ -43,7 +45,6 @@ class MapScreen extends React.Component {
   }
 
   componentWillMount() {
-
     //get and store current user's location'
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -117,6 +118,7 @@ class MapScreen extends React.Component {
       parkingEndTime: new Date().toDateString(),
       handoffTime: new Date().toDateString(),
       pickupLocation: pickupLocation,
+      parkingLocation : { destination: "Home", latitude: 0.0, longitude: 0.0 },
       handoffLocation: { destination: "", latitude: 0.0, longitude: 0.0 },
       totalCost: 0,
       paidCost: 0,
@@ -160,12 +162,14 @@ class MapScreen extends React.Component {
     var _this = this
     const order = this.createOrder(firebase.auth().currentUser.uid)
     this.props.placeOrder(order).then(res => {
+      //once we place the order, we start listening for order updates from FB
       this.props.startListenOrderUpdates()
       //Alert.alert("Order Placed")
     }).catch(error => {
       Alert.alert("Sorry, something went wrong")
     })
   }
+
   //redraw our marker in the middle of the map
   onRegionChange(region) {
     //console.log(region)
@@ -180,9 +184,28 @@ class MapScreen extends React.Component {
       })
   }
 
+  onReturnMyCarPressed() {
+
+  }
+
+  getOverlayView() {
+    //this determines which view we will see according to the state of the current order
+    switch (this.props.order.orderStatus) {
+      case orderStatusEnum.none : 
+      if (this.state.destination != "" && this.state.canPlaceOrder) {
+        return (<ParkzMyCarView onPress={() => this.onOrderPlaced() }/>)
+      }
+      break
+      case orderStatusEnum.open : 
+        return (<PickupValetView onCancel={() => this.onOrderCancelled()}/>)
+      case orderStatusEnum.carPickedup : 
+      case orderStatusEnum.carParked :
+        return (<ReturnMyCarView onPress={()=> this.onReturnMyCarPressed()}/>)  
+    }
+    //if no conditions match, we return no view
+  }
+
   render() {
-    const ParkzMyCar = (<ParkzMyCarView onPress={() => this.onOrderPlaced() }/>)
-    const PickupValet = (<PickupValetView onCancel={() => this.onOrderCancelled()}/>)
     return (
       <View style={styles.container}>
         <MapView ref="mapView" style={{ flex: 1 }} showsUserLocation={true}  followsUserLocation = {true} showsCompass={false}
@@ -201,13 +224,22 @@ class MapScreen extends React.Component {
             fillColor= '#f007'
             strokeWidth = {3}
             />
+          {
+            this.props.order.orderStatus == orderStatusEnum.carParked &&
+            <MapView.Marker
+              key = "car"
+              coordinate={{ latitude : this.props.order.parkingLocation.latitude, longitude : this.props.order.parkingLocation.longitude}}
+              title="My Car"
+              image={require('../assets/images/car.png')}
+              />
+          }
           <MapView.Marker key="centerMarker" coordinate={{ latitude: this.state.region.latitude, longitude: this.state.region.longitude }} />
           {this.props.valetData.map(valet => (
             <MapView.Marker
               key = {valet.firstName}
               coordinate={valet.location}
               title={valet.firstName}
-              //image={require('../assets/images/waze_icon.png')}
+              image={  this.props.order.orderStatus == orderStatusEnum.carPickedup ? require('../assets/images/car.png') : require('../assets/images/valet.png')}
               />
           )) }
         </MapView>
@@ -300,7 +332,7 @@ class MapScreen extends React.Component {
 
         </View>
         <View position='absolute' bottom = {0} left = {0} right={0} alignSelf = 'stretch' >
-        { (this.props.order.orderStatus == orderStatusEnum.open && PickupValet) || (this.state.destination != "" && this.state.canPlaceOrder && ParkzMyCar)}
+        { this.getOverlayView() }
         </View>
       </View>
     );

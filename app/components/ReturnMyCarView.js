@@ -9,25 +9,25 @@ import {
 import {connect} from 'react-redux'
 import * as style from '../style.js'
 import ParkzButton from './ParkzButton'
-import NavButton from './NavButton'
+import { orderStatusEnum } from '../utils/enums.js'
+
 class ReturnMyCarView extends React.Component {
     constructor(props) {
         super(props)
         console.log(props)
     }
 
+    getTextByOrderState() {
+        return (!this.props.isParked ? <Text> {this.props.valet.firstName } is parking your car.</Text> : 
+            <Text> Your car is parked at { this.props.order.parkingLocation.destination }</Text>
+        )
+    }
     render() {
         return (
             <View View style={[style.overlayViewStyle, { height: 200 }]}>
-                <NavButton />
-                <Text>
-                    Your valet is: {this.props.valet && this.props.valet.firstName}
-                </Text>
-                <Image source={require('../assets/images/falcon.jpg')} style= {{width : 100, height : 100}} />
-                <Text>
-                    {this.props.valet && this.props.valet.firstName}'s ETA is  : {this.props.valet.etaInMinutes} minutes
-                </Text>
-                <ParkzButton buttonStyle = {{ backgroundColor: 'red' }} text='Cancel Order' width={200} onPress={() => this.props.onCancel()}  />
+                {this.getTextByOrderState()}
+                {this.props.isParked || <Image source={require('../assets/images/falcon.jpg')} style= {{width : 100, height : 100}} />}
+                <ParkzButton buttonStyle = {{ backgroundColor: 'green' }} text='Return My Car' width={200} onPress={() => this.props.onPress()}  />
             </View>
         )
     }
@@ -35,6 +35,7 @@ class ReturnMyCarView extends React.Component {
 const mapStateToProps = (state) => {
     return ({
     order: state.order,
+    isParked : state.order.orderStatus == orderStatusEnum.carParked,
     valet: state.valetData[state.order.parkValetID] })
 }
 

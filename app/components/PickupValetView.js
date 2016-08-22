@@ -25,7 +25,7 @@ class PickupValetView extends React.Component {
                 </Text>
                 <Image source={require('../assets/images/falcon.jpg')} style= {{width : 100, height : 100}} />
                 <Text>
-                    {this.props.valet && this.props.valet.firstName}'s ETA is  : {this.props.valet.etaInMinutes} minutes
+                    {this.props.valet && this.props.valet.firstName}'s ETA is  : {this.props.order.valetETAInMinutes} minutes
                 </Text>
                 <ParkzButton buttonStyle = {{ backgroundColor: 'red' }} text='Cancel Order' width={200} onPress={() => this.props.onCancel()}  />
             </View>
