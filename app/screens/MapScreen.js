@@ -18,9 +18,10 @@ import ParkzButton from '../components/ParkzButton'
 import ParkzMyCarView from '../components/ParkzMyCarView'
 import PickupValetView from '../components/PickupValetView'
 import ReturnMyCarView from '../components/ReturnMyCarView'
+import ParkzMapView from '../components/ParkzMapView'
 import {connect} from 'react-redux'
 import { setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents , startListenToOrderFBEvents } from '../reducers/parkzActions'
-import MapView from 'react-native-maps'
+
 import { orderStatusEnum } from '../utils/enums.js'
 import { asyncGetETA} from '../utils/valetLocationUpdater.js'
 
@@ -108,7 +109,7 @@ class MapScreen extends React.Component {
       orderStatus : orderStatusEnum.none,
       userID: userID,
       parkValetID: "valet01",
-      returnValetID: "",
+      returnValetID: "valet01",
       carCode: "",
       licensePlateNumber: "",
       orderTime: new Date().toDateString(),
@@ -170,11 +171,7 @@ class MapScreen extends React.Component {
     })
   }
 
-  //redraw our marker in the middle of the map
-  onRegionChange(region) {
-    //console.log(region)
-   // this.setState({region})
-  }
+
 
   onOrderCancelled() {
       this.props.cancelOrder(this.props.order).then(function(res) {
@@ -201,6 +198,9 @@ class MapScreen extends React.Component {
       case orderStatusEnum.carPickedup : 
       case orderStatusEnum.carParked :
         return (<ReturnMyCarView onPress={()=> this.onReturnMyCarPressed()}/>)  
+      case orderStatusEnum.carRequested:
+      case orderStatusEnum.carReturning:
+         return (<carReturningView/>)  
     }
     //if no conditions match, we return no view
   }
@@ -208,41 +208,7 @@ class MapScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <MapView ref="mapView" style={{ flex: 1 }} showsUserLocation={true}  followsUserLocation = {true} showsCompass={false}
-          region = {this.state.region}
-          onRegionChange={(region) => this.onRegionChange(region)}
-          >
-          <MapView.Polygon
-            coordinates = {[
-              { latitude: 32.096824, longitude: 34.774748 },
-              { latitude: 32.098860, longitude: 34.801122 },
-              { latitude: 32.069243, longitude: 34.787793 },
-              { latitude: 32.073773, longitude: 34.765000 },
-              { latitude: 32.096824, longitude: 34.774748 },
-            ]}
-            strokeColor= '#f007'
-            fillColor= '#f007'
-            strokeWidth = {3}
-            />
-          {
-            this.props.order.orderStatus == orderStatusEnum.carParked &&
-            <MapView.Marker
-              key = "car"
-              coordinate={{ latitude : this.props.order.parkingLocation.latitude, longitude : this.props.order.parkingLocation.longitude}}
-              title="My Car"
-              image={require('../assets/images/car.png')}
-              />
-          }
-          <MapView.Marker key="centerMarker" coordinate={{ latitude: this.state.region.latitude, longitude: this.state.region.longitude }} />
-          {this.props.valetData.map(valet => (
-            <MapView.Marker
-              key = {valet.firstName}
-              coordinate={valet.location}
-              title={valet.firstName}
-              image={  this.props.order.orderStatus == orderStatusEnum.carPickedup ? require('../assets/images/car.png') : require('../assets/images/valet.png')}
-              />
-          )) }
-        </MapView>
+        <ParkzMapView state={this.state}/>
         <View style = {{
           flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', position: 'absolute',
           top: 10,
