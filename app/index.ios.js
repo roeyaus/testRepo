@@ -1,23 +1,16 @@
-import { createStore, applyMiddleware, combineReducers } from 'redux';
-import { Provider } from 'react-redux';
 import { Navigation } from 'react-native-navigation';
-import thunk from 'redux-thunk';
+
 import { connect } from 'react-redux'
-var { AsyncStorage } = require('react-native')
-import { compose } from 'redux'
-import { persistStore, autoRehydrate } from 'redux-persist'
+import { persistStore } from 'redux-persist'
 import parkzReducer from './reducers/parkzReducers'
 import {registerForValetLocationUpdates, unregisterForValetLocationUpdates} from './utils/valetLocationUpdater.js'
-const store = createStore(parkzReducer, {}, compose(
-  applyMiddleware(thunk),
-  autoRehydrate()
-))
-
 import * as firebase from 'firebase';
-
+var { AsyncStorage } = require('react-native')
+import {createParkzStore, loadStore} from './storage/store.js'
+import { Provider } from 'react-redux';
 // screen related book keeping
 import { registerScreens } from './screens';
-registerScreens(store, Provider);
+
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -33,9 +26,11 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 export default class Application {
   constructor(props) {
     //load the persisted store
+    const store = createParkzStore(parkzReducer)
+    registerScreens(store, Provider);
     persistStore(store, { storage: AsyncStorage }, null).purge(['order'])
     persistStore(store, { storage: AsyncStorage }, null).purge(['valetData'])
-    persistStore(store, { storage: AsyncStorage }, () => {
+    loadStore(store, () => {
 
       const state = store.getState()
       console.log("state restored : ", state, ", loading initial screen")
