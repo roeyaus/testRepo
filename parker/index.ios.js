@@ -17,6 +17,11 @@ import {
   Linking,
   Image
 } from 'react-native';
+var { AsyncStorage } = require('react-native')
+import {createParkzStore, loadStore} from './storage/store.js'
+import { Provider } from 'react-redux';
+import { registerScreens } from './screens';
+
 var DOMParser = require('xmldom').DOMParser;
 
 var showFreeIfUnderDuration = 10
@@ -25,9 +30,17 @@ var VacancyEnum = {
     Full : 1,
     Unknown : 2
 }
+
 class valet extends Component {
   constructor(props) {
 super(props)
+//store related stuff
+const store = createParkzStore(parkerReducer)
+    registerScreens(store, Provider);
+    persistStore(store, { storage: AsyncStorage }, null).purge(['order'])
+    persistStore(store, { storage: AsyncStorage }, null).purge(['valetData'])
+    loadStore(store, () => {
+
 this.state = {
   query : {},
   dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),

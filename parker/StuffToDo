@@ -1,0 +1,47 @@
+Parker app : 
+
+
+* Login screen 
+	* User ID
+	* Password
+* Push notification of work assignment
+	* "FindValet" lambda activates the APN service and sends a notification to the valet that he is assigned.
+	* Pressing the push notificaiton opens the app on "Confirm Assignment" page
+* Confirm Assignment Screen : 
+	* Customer name
+	* Pickup Location
+	* ETA (How long valet has to reach pickup location)
+	* "Confirm" button	
+* Main screen : 
+	* Assignment received : 
+		* map :
+			* customer icon
+		* overlay : 
+			* customer name
+			* pickup location
+			* ETA (when customer will be in pickup location)
+			* Waze icon
+			* "Car Received" button
+	* Car Received :
+		* Nav bar - back to Assignment Received
+		* Odometer Text field
+		* "360 Film"/"Take pictures" Button (Activates Camera, valet films car and it uploads to Cloud storage automatically , Not sure if this is important)
+		* Next button
+	* Parking Car : 
+		* Nav bar - back to Car Received
+		* Develop "FindParking" lambda - should find the closest+cheapest parking lot from any location.
+		* Call "FindParking" lambda and save result in state
+		* Map : (focused on current location)
+			* Assigned Parking lot 
+		* Small Overlay : 
+			* Parking lot address
+			* Waze icon 
+			* Car Parked Button
+	* Car Parked : 
+		* Nav bar - back to parking car
+		* Put keys in : 
+			* Mailbox/office address
+		* Waze icon (navigate to key drop)
+		* "keys dropped" button - pressing this signals firebase 
+	* Keys dropped : 
+		* Assignment summary

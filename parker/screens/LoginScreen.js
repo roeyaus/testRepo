@@ -1,26 +1,39 @@
-// @flow
-import React, { Component } from 'react';
 import {
-StyleSheet,
-View,
-TextInput,
-Text
-} from 'react-native';
-import ParkzTextField from '../components/ParkzTextField'
+	View
+} from 'react-native'
 
-module.exports = class LoginScreen extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            email : "your@mail.com",
-            password : "8 Characters Min.",
-          error : ""
-        }
-    }
-  render() {
-      return (
-          <View style={styles.menuView}>
-          <ParkzTextField 
+import ParkzTextField from '../../app/components/ParkzTextField'
+import ParkzButton from '../../app/components/ParkzButton'
+import {loginScreenView} from '../assets/styles/styles.js'
+
+class LoginScreen extends React.Component {
+constructor(props) {
+	super(props)
+}
+
+valetSignIn() {
+	firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(function () { 
+                  //Sign in was succesful
+                  console.log("valet sign in for " + this.state.email + " successful")
+                  //now we must update the app state with the signed in user
+                  
+                },function(error) {
+                  // Handle Errors here.
+                  var errorCode = error.code;
+                  var errorMessage = error.message;
+                  console.log("sign in user error : " + errorCode + ", " + errorMessage)
+                  _this.setState({
+                    error : "Sorry, please try again"
+                  })
+                  // ...
+                });
+
+}
+
+render () {
+	return (
+		<View style = {loginScreenView}>
+			<ParkzTextField 
             ref = "Email"
             leftText={"Email"}
             onFocus={() => {
@@ -36,7 +49,8 @@ module.exports = class LoginScreen extends React.Component {
             placeholder={this.state.email}
             autoFocus={true}
             returnKeyType='next' />
-       <ParkzTextField
+
+			<ParkzTextField
          leftText={"Password"}
             onChangeText={(text) => {
             this.setState( {
@@ -51,33 +65,16 @@ module.exports = class LoginScreen extends React.Component {
                 error : ""
               })
             }}
-            onSubmitEditing={() => {
-                _this = this
-                firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(function () { 
-                  //Sign in was succesful
-                  console.log("user sign in for " + this.state.email + " successful")
-                  //now we must update the app state with the signed in user
-                  
-                },function(error) {
-                  // Handle Errors here.
-                  var errorCode = error.code;
-                  var errorMessage = error.message;
-                  console.log("sign in user error : " + errorCode + ", " + errorMessage)
-                  _this.setState({
-                    error : "Sorry, please try again"
-                  })
-                  // ...
-                });
-            }}/>
+            onSubmitEditing={() => valetSignIn() }/>
           <Text>{this.state.error}</Text>
-          </View>
-      )
-  }
+           <ParkzButton
+          text='Log In'
+          buttonStyle = {{ backgroundColor: 'black' }}
+          onPress = {() => this.login() }
+          />
+			
+		</View> 
+	)
 }
 
-const styles = StyleSheet.create({
-    menuView : {
-        flex : 1,
-        flexDirection : 'column'
-    }
-})
+}

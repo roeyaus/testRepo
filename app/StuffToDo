@@ -1,0 +1,20 @@
+* Sign-up screen theme (like address bar in main screen)
+* Login screen  : 
+	* theme
+	* login button
+	* 
+* Main screen : 
+	* Overlay views slide up
+	* Overlay views slide down after a few seconds 
+	* Overlay views add minimize/maximize icons
+	* Connect Waze button
+	* Locating Valet overlay : 
+		* styling
+		* Text 
+		* Develop "FindValet" lambda - should locate closest valet who's not occupied 
+	* Valet On route overlay : 
+		* Add text/call icons
+		* Add pickup address 
+	* Valet Parking overlay : 
+		* add text/call icons
+
