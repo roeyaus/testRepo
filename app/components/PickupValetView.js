@@ -18,7 +18,7 @@ class PickupValetView extends React.Component {
 
     render() {
         return (
-            <View View style={[style.overlayViewStyle, { height: 200 }]}>
+            <View View style={[style.overlayViewStyle, { height: 400 }]}>
                 <NavButton />
                 <Text>
                     Your valet is: {this.props.valet && this.props.valet.firstName}
@@ -27,6 +27,7 @@ class PickupValetView extends React.Component {
                 <Text>
                     {this.props.valet && this.props.valet.firstName}'s ETA is  : {this.props.order.valetETAInMinutes} minutes
                 </Text>
+                <Text> Don't worry, you can cancel at any time until your car gets picked up </Text>
                 <ParkzButton buttonStyle = {{ backgroundColor: 'red' }} text='Cancel Order' width={200} onPress={() => this.props.onCancel()}  />
             </View>
         )

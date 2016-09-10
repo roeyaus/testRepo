@@ -1,13 +1,14 @@
 export const orderStatusEnum = {
     none : 0,
     open : 1,
-    carPickedup : 2, 
-    carParked : 3,
-    carRequested : 4,
-    carReturning : 5,
-    carReturned : 6,
-    closedPaid : 7,
-    closedNotPaid : 8,
-    cancelled : 9,    
-    disputed : 10
+    valetAssigned : 2,
+    carPickedup : 3, 
+    carParked : 4,
+    carRequested : 5,
+    carReturning : 6,
+    carReturned : 7,
+    closedPaid : 8,
+    closedNotPaid : 9,
+    cancelled : 10,    
+    disputed : 11
 }

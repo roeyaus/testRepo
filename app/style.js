@@ -9,6 +9,7 @@ var {
 module.exports = StyleSheet.create({
 
 overlayViewStyle : {
+  flex : 1,
     flexDirection : 'column' ,
     justifyContent : 'space-around',  
     backgroundColor:'rgba(255,255,255,0.8)', 

@@ -19,12 +19,11 @@ import ParkzMyCarView from '../components/ParkzMyCarView'
 import PickupValetView from '../components/PickupValetView'
 import ReturnMyCarView from '../components/ReturnMyCarView'
 import CarReturningView from '../components/CarReturningView'
-import LookingForValet from '../components/LookingForValet'
 import ParkzMapView from '../components/ParkzMapView'
 import { Navigation } from 'react-native-navigation';
 
 import {connect} from 'react-redux'
-import { setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents, startListenToOrderFBEvents } from '../reducers/parkzActions'
+import { setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents , startListenToOrderFBEvents } from '../reducers/parkzActions'
 
 import { orderStatusEnum } from '../utils/enums.js'
 import { asyncGetETA} from '../utils/valetLocationUpdater.js'
@@ -35,11 +34,11 @@ class MapScreen extends React.Component {
     this.state = {
       currentLocation: {},
       destination: "",
-      region: {
-        latitude: 0,
-        longitude: 0,
-        latitudeDelta: 0.00922,
-        longitudeDelta: 0.00421,
+      region : {
+         latitude : 0,
+         longitude : 0,
+         latitudeDelta: 0.00922,
+         longitudeDelta: 0.00421,
       },
       destLat: 0.0,
       destLong: 0.0,
@@ -54,12 +53,8 @@ class MapScreen extends React.Component {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         var initialPosition = JSON.stringify(position);
-        this.setState({
-          region: {
-            latitude: position.coords.latitude, longitude: position.coords.longitude,
-            latitudeDelta: this.state.region.latitudeDelta, longitudeDelta: this.state.region.longitudeDelta
-          }
-        });
+        this.setState({ region : { latitude : position.coords.latitude, longitude : position.coords.longitude,
+          latitudeDelta : this.state.region.latitudeDelta, longitudeDelta : this.state.region.longitudeDelta } });
         console.log(initialPosition)
       },
       (error) => alert(error.message),
@@ -69,12 +64,8 @@ class MapScreen extends React.Component {
     //register for user location changes and update the state
     this.watchID = navigator.geolocation.watchPosition((position) => {
       console.log(position.coords)
-      this.setState({
-        currentLocation: position.coords, region: {
-          latitude: position.coords.latitude, longitude: position.coords.longitude,
-          latitudeDelta: this.state.region.latitudeDelta, longitudeDelta: this.state.region.longitudeDelta
-        }
-      });
+      this.setState({ currentLocation: position.coords, region : { latitude : position.coords.latitude, longitude : position.coords.longitude,
+        latitudeDelta : this.state.region.latitudeDelta, longitudeDelta : this.state.region.longitudeDelta }});
       this.props.updateLocation(position.coords)
 
     }, (error) => {
@@ -118,7 +109,7 @@ class MapScreen extends React.Component {
 
     return ({
       serviceZoneID: "",
-      orderStatus: orderStatusEnum.none,
+      orderStatus : orderStatusEnum.none,
       userID: userID,
       parkValetID: "valet01",
       returnValetID: "valet02",
@@ -131,14 +122,14 @@ class MapScreen extends React.Component {
       parkingEndTime: new Date().toDateString(),
       handoffTime: new Date().toDateString(),
       pickupLocation: pickupLocation,
-      parkingLocation: { destination: "Home", latitude: 0.0, longitude: 0.0 },
+      parkingLocation : { destination: "Home", latitude: 0.0, longitude: 0.0 },
       handoffLocation: { destination: "", latitude: 0.0, longitude: 0.0 },
       totalCost: 0,
       paidCost: 0,
       tip: 0,
       rating: 0,
       comments: "",
-      valetETAInMinutes: 0
+      valetETAInMinutes : 0
     })
   }
   // OrderID
@@ -186,11 +177,11 @@ class MapScreen extends React.Component {
 
 
   onOrderCancelled() {
-    this.props.cancelOrder(this.props.order).then(function (res) {
-      //order has been cancelled
-    }).catch(function (error) {
-      Alert.alert("Sorry, something went wrong")
-    })
+      this.props.cancelOrder(this.props.order).then(function(res) {
+          //order has been cancelled
+      }).catch(function(error){
+        Alert.alert("Sorry, something went wrong")
+      })
   }
 
   onReturnMyCarPressed() {
@@ -200,29 +191,27 @@ class MapScreen extends React.Component {
   getOverlayView() {
     //this determines which view we will see according to the state of the current order
     switch (this.props.order.orderStatus) {
-      case orderStatusEnum.none:
-        if (this.state.destination != "" && this.state.canPlaceOrder) {
-          return (<ParkzMyCarView onPress={() => this.onOrderPlaced() }/>)
-        }
-        break
-      case orderStatusEnum.open:
-        return (<LookingForValet onCancel={() => this.onOrderCancelled() }/>)
-      case orderStatusEnum.valetAssigned:
-        return (<PickupValetView onCancel={() => this.onOrderCancelled() }/>)
-      case orderStatusEnum.carPickedup:
-      case orderStatusEnum.carParked:
-        return (<ReturnMyCarView onPress={() => this.onReturnMyCarPressed() }/>)
+      case orderStatusEnum.none : 
+      if (this.state.destination != "" && this.state.canPlaceOrder) {
+        return (<ParkzMyCarView onPress={() => this.onOrderPlaced() }/>)
+      }
+      break
+      case orderStatusEnum.open : 
+        return (<PickupValetView onCancel={() => this.onOrderCancelled()}/>)
+      case orderStatusEnum.carPickedup : 
+      case orderStatusEnum.carParked :
+        return (<ReturnMyCarView onPress={()=> this.onReturnMyCarPressed()}/>)  
       case orderStatusEnum.carRequested:
       case orderStatusEnum.carReturning:
-        return (<CarReturningView/>)
-      case orderStatusEnum.carReturned:
-        Navigation.startSingleScreenApp({
-          screen: {
-            screen: 'Parkz.OrderCompletedScreen',
-            title: 'Thank You!',
-            navigatorStyle: {}
-          }
-        })
+         return (<CarReturningView/>)
+         case orderStatusEnum.carReturned:
+         Navigation.startSingleScreenApp({
+            screen: {
+              screen: 'Parkz.OrderCompletedScreen',
+              title: 'Thank You!',
+              navigatorStyle: {}
+            }
+         })
         break;
     }
     //if no conditions match, we return no view
@@ -241,7 +230,7 @@ class MapScreen extends React.Component {
           <GooglePlacesAutocomplete
             placeholder='Where are you driving to?'
             textInputProps={{
-              autoCorrect: false
+              autoCorrect : false
             }}
             minLength={2} // minimum length of text to search 
             // autoFocus={true}
@@ -251,12 +240,8 @@ class MapScreen extends React.Component {
               console.log(data);
               console.log(details);
               console.log(details.geometry.location.lat, ",", details.geometry.location.lng)
-              this.setState({
-                destination: data.description, region: {
-                  latitude: details.geometry.location.lat, longitude: details.geometry.location.lng,
-                  latitudeDelta: this.state.region.latitudeDelta, longitudeDelta: this.state.region.longitudeDelta
-                }
-              })
+              this.setState({ destination: data.description, region : { latitude : details.geometry.location.lat, longitude: details.geometry.location.lng,
+                 latitudeDelta : this.state.region.latitudeDelta, longitudeDelta : this.state.region.longitudeDelta }})
             } }
             getDefaultValue={() => {
               return ''; // text input default value 
@@ -312,8 +297,8 @@ class MapScreen extends React.Component {
             nearbyPlacesAPI='GoogleReverseGeocoding' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch 
             GoogleReverseGeocodingQuery={{
               // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro 
-              latitude: this.state.region.latitude,
-              longitude: this.state.region.longitude,
+              latitude : this.state.region.latitude,
+              longitude : this.state.region.longitude,
               key: 'AIzaSyCMJpcMKtuafU2buTcPb1T0jBym-hovsy8'
             }}
             GooglePlacesSearchQuery={{
@@ -325,7 +310,7 @@ class MapScreen extends React.Component {
 
         </View>
         <View position='absolute' bottom = {0} left = {0} right={0} alignSelf = 'stretch' >
-          { this.getOverlayView() }
+        { this.getOverlayView() }
         </View>
       </View>
     );
@@ -347,14 +332,14 @@ const styles = StyleSheet.create({
 const mapDispatchToProps = (dispatch) => ({
   placeOrder: order => dispatch(setOpenOrder(order)),
   updateLocation: location => dispatch(setUserLocation(location)),
-  cancelOrder: order => dispatch(setCancelOrder(order)),
-  startListenValetUpdates: () => dispatch(startListenToValetFBEvents()),
-  startListenOrderUpdates: () => dispatch(startListenToOrderFBEvents())
+  cancelOrder : order => dispatch(setCancelOrder(order)),
+  startListenValetUpdates : () => dispatch(startListenToValetFBEvents()),
+  startListenOrderUpdates : () => dispatch(startListenToOrderFBEvents())
 })
 
 const mapStateToProps = (state) => ({
   valetData: Object.keys(state.valetData).map(key => state.valetData[key]),
-  order: state.order
+  order : state.order
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapScreen)
