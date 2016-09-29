@@ -8,7 +8,7 @@
   "dependencies": {
     "firebase": "^3.2.1",
     "react": "15.1.0",
-    "react-native": "0.28.0",
+    "react-native": "0.29.0",
     "react-native-google-places-autocomplete": "^1.2.2",
     "react-native-maps": "^0.7.1",
     "react-native-maps-google": "^1.1.4",

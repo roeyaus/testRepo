@@ -10,12 +10,15 @@ Text,
 import * as style from '../style.js'
 import NavButton from './NavButton'
 import ParkzButton from './ParkzButton'
-const ParkzMyCarView = ({onPress}) => (
- 
-    <View style={[style.overlayViewStyle, {height : 50}]}>
+import ParkzDynamicOverlay from './ParkzDynamicOverlay'
+
+const ParkzMyCarView = ({onPress}) => ( 
+  <ParkzDynamicOverlay expandable={false}>
+    <View style={[style.nonExpandableOverlayViewStyle]}>
     <NavButton />
       <ParkzButton buttonStyle = {{ backgroundColor: 'blue' }} text='Parkz My Car' width={200} onPress={onPress}  />
     </View>
+     </ParkzDynamicOverlay>
 )
 
 export default ParkzMyCarView

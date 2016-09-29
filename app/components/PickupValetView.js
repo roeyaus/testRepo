@@ -10,6 +10,8 @@ import {connect} from 'react-redux'
 import * as style from '../style.js'
 import ParkzButton from './ParkzButton'
 import NavButton from './NavButton'
+import ParkzDynamicOverlay from './ParkzDynamicOverlay'
+
 class PickupValetView extends React.Component {
     constructor(props) {
         super(props)
@@ -18,7 +20,8 @@ class PickupValetView extends React.Component {
 
     render() {
         return (
-            <View View style={[style.overlayViewStyle, { height: 400 }]}>
+            <ParkzDynamicOverlay expandable={true}>
+            <View style={[style.overlayExpandedViewStyle, { height: 400 }]}>
                 <NavButton />
                 <Text>
                     Your valet is: {this.props.valet && this.props.valet.firstName}
@@ -30,6 +33,7 @@ class PickupValetView extends React.Component {
                 <Text> Don't worry, you can cancel at any time until your car gets picked up </Text>
                 <ParkzButton buttonStyle = {{ backgroundColor: 'red' }} text='Cancel Order' width={200} onPress={() => this.props.onCancel()}  />
             </View>
+            </ParkzDynamicOverlay>
         )
     }
 }
