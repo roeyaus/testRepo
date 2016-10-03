@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Bootstrap core CSS -->
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css"/>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap-theme.min.css"/>
+  <!-- Loading custom fonts -->
+
+  <!-- Add custom CSS here -->
+  <style>
+
+  body {
+    color: #394046;
+    background-color: #ffffff;
+    {{ content.body_font | font_family}}
+  }
+
+  h1, h2, h3, h4, h5, h6{
+    {{ content.headline_font | font_family}}
+
+  }
+
+  a{
+    color:#0088cc;
+    -webkit-transition: .4s;
+    -moz-transition: .4s;
+    -ms-transition: .4s;
+    -o-transition: .4s;
+    transition: .4s;
+  }
+  button {
+    -webkit-transition: .3s;
+    -moz-transition: .3s;
+    -ms-transition: .3s;
+    -o-transition: .3s;
+    transition: .3s;
+  }
+  a:hover{
+    color:{{#0088cc | darker_color}};
+  }
+
+  img {
+    display: block;
+    height: auto;
+    max-width: 100%;
+  }
+
+  div embed,
+  div object,
+  div iframe,
+  p embed,
+  p object,
+  p iframe {
+    max-width:100% !important;
+  }
+
+  ul, ol {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .kol_social_url a{
+    font-size: 2.1rem;
+    color:#ffffff;
+  }
+
+  .kol_social_url a:hover{
+    color:#ffffff;
+    text-decoration:none;
+  }
+
+  .top-row{padding:10px 0;}
+  .top-row .signin{
+    display:inline-block;
+    text-align:right;
+    float:right;}
+  .top-row img {
+    width: 250px;
+  }
+  .banner{width:100%; padding:100px 0;  }
+
+  .backstretch {
+      opacity:0.3;
+  }
+
+  .image-overlay{
+      opacity:0.8;
+  }
+
+  .top_right{
+    margin-top:10px;
+  }
+
+  .banner.thanks-banner,
+  .banner.header-banner {
+    padding:10rem 0;
+  }
+  .banner{
+    color:#ffffff;
+    background-color: #f58720;
+  }
+  .banner h1, .banner h2, .banner h3,.banner h4,.banner h5,.banner h6{
+    color:#ffffff;
+    {{ content.headline_font | font_family}}
+    text-align:center;
+  }
+  h1.headline {
+    margin-bottom: 2rem;
+  }
+  .banner h1{
+    margin-bottom: 1.5rem;
+    text-align:center;
+    {{ content.title_font | font_family}}
+  }
+  .banner p{ color:#ffffff; font-size:25px; text-align:center; line-height:30px; padding:0px 0 10px; margin:0px;
+  {{ content.body_font | font_family}}
+  }
+  .banner .navbar-form{display:block; text-align:center;}
+  .footer_banner{background:#e2e2e2; color:#272727; border:none;}
+
+  .footer_banner h2{font-size: 38px; color:#272727;  text-align: center;}
+  .footer_banner p{color:#272727;}
+  .footer{background-color:#ffffff; text-align:center; display:block; padding:50px 0; color:#f58720;}
+
+  .footer p a{color:#f58720 text-decoration:none;}
+  .footer p a:hover{color:{{content.footer_text_color | darker_color}}; text-decoration:underline;}
+  .nospace{padding-bottom:0px; margin:0px;}
+  .footer-text p {
+    margin: 0;
+  }
+  .footer-text p a:hover {
+    text-decoration: none;
+  }
+  .section, .section-colored, .rewards-section{padding: 50px 0;}
+  .section-colored{background-color: {{content.secondary_background_color}}; }
+  .invite-frnd ul{margin:0; padding:0px; list-style-type:none; display:block; text-align:center;}
+  .invite-frnd ul li{ margin:0px -5px 8px; padding:0px; display:inline-block; min-width:160px; max-width:160px;text-align:left; font-weight:bold; font-size:12px; vertical-align:middle;}
+  .invite-frnd ul li:first-child, .reward-span{text-align:right; padding-right:30px;font-size:18px;}
+  .banner .invite-btn{padding:15px 0 30px;}
+  .banner-share .form-control{font-size:18px;}
+  .banner-share .form-control::-moz-placeholder{color:#525252;}
+  .banner-share p{font-size:22px;}
+
+
+  .invite-frnd p{text-align:center; padding:70px 0 0;  font-weight:bold; font-size:22px;}
+  .invite-frnd p span{color:#5ac1a0; font-size:25px;}
+  .lime-green{color:#0088cc;}
+  .img-placeholder h2{text-align:center; padding:65px 0; font-size:24px; }
+  .img-placeholder p{text-align:center; padding:60px 0; font-size:16px;  clear:both;}
+  .img-placeholder img{margin-bottom:20px;}
+  .sm_device{display:none;}
+  .circle-text {
+    margin-right: -3px;
+    width: 25%;
+    float:left;
+  }
+  #share_links{
+    text-align:center;
+  }
+
+  .social{
+    margin:10px;
+  }
+  .social a {
+    background: #0088cc;
+    color:  {{#0088cc | font_color_from_background : '#FFFFFF', '#000000'}} !important;
+    font-size: 1em;
+    text-decoration: none;
+    display: inline-block;
+    width: 1.6em;
+    height: 1.6em;
+    line-height: 1.6em;
+    text-align: center;
+    margin-right: 5px;
+    border-radius: 50%;
+  }
+
+  .form-inline{
+    text-align:center;
+    padding-top:10px;
+  }
+
+  .btn-primary, .btn-primary:focus {
+    color: #fff;
+    background-color: #0088cc;
+    border-color:#0088cc;
+    border-radius: 0px;
+    white-space: normal;
+  }
+
+  .form-control{
+    border-radius:0px;
+    margin-bottom:5px;
+  }
+  .banner button.btn{
+    margin-bottom:5px;
+  }
+
+  .text-after-form {
+    margin-top: 3rem;
+  }
+
+  .fa{
+    line-height:1.6;
+  }
+
+  .btn-primary:hover {
+
+    background-color: #0088cc
+    border-color:#0088cc
+  }
+
+  .section, .section-colored {
+    padding-bottom: 0px;
+  }
+
+  .feature-section {
+    padding-top: 0 !important;
+  }
+
+  .feature {
+    display: block;
+  }
+
+  .feature-img {
+    min-height: 250px;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .top-row img {
+      width: 250px;
+    }
+    .feature {
+    	display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+    	-webkit-box-align: stretch;
+      -moz-box-align: stretch;
+      -ms-flex-align: stretch;
+      -webkit-align-items: stretch;
+      align-items: stretch;
+    }
+
+    .feature-img {
+      min-height: none;
+    }
+
+    .final-overview {
+      display: flex;
+      align-items: stretch;
+    }
+  }
+
+  .feature-img {
+    background-size: cover;
+  }
+
+  .img-1 {
+    background-image: url('./assets/images/no_parking.jpg');
+  }
+
+  .img-2 {
+    background-image: url('./assets/images/handing-over-car-keys.jpg');
+  }
+
+  .img-3 {
+    background-image: url('./assets/images/parking_lot.jpg');
+  }
+
+  .img-4 {
+    background-image: url('./assets/images/tel_aviv_night_skyline.jpg');
+  }
+
+  .img-5 {
+    background-image: url('{{content.feature_five_image}}');
+  }
+
+  .img-6 {
+    background-image: url('{{content.feature_six_image}}');
+  }
+
+  .feature-text {
+    padding-top: 100px;
+    padding-bottom: 100px;
+    margin-bottom: 1.5rem;
+  }
+  .feature-text p {
+    font-size: 1.6rem;
+    line-height: 1.8;
+    margin-bottom: 13px;
+  }
+  @media only screen and (min-width:1500px) {
+    .feature-text {
+      padding-top: 200px;
+      padding-bottom: 200px;
+    }
+  }
+
+  .col-img {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .banner .btn{float: none;}
+
+  .second-headline {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background:#E8E8E8;
+  }
+
+  .overview-item {
+    padding-top: 100px;
+    padding-bottom: 100px;
+    background-size: cover;
+    color: #fff;
+    position: relative;
+  }
+  .overview-item p {
+    font-size: 1.6rem;
+    margin-top: 1rem;
+    line-height: 1.8;
+  }
+
+  .content *{
+    z-index: 999;
+    position: relative;
+  }
+
+  .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 1;
+    transition: opacity .5s ease;
+  }
+
+  .overview-item:hover .image-overlay {
+      opacity:0.85;
+  }
+
+  .point-1 {
+    background-image: url('');
+  }
+
+  .point-2 {
+    background-image: url('{{content.overview_two_image}}');
+  }
+
+  .point-3 {
+    background-image: url('{{content.overview_three_image}}');
+  }
+
+  .testimonials {
+    background: {{content.testimonial_background_color}};
+    color: {{content.testimonial_text_color}};
+    padding-top:7rem;
+  }
+
+  .testimonial-description {
+    border-right: 0 none;
+    font-size: 18px;
+    line-height: 25px;
+    padding-right: 6rem;
+    text-align: left;
+    color: {{content.testimonial_text_color}};
+  }
+
+  .testimonial-description h5 {
+    font-weight: 600;
+  }
+
+  .testimonial-description:before,
+  .testimonial-description:after {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 33px;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+  }
+
+  .testimonial-description:before {
+    content: "\f10d";
+    position: absolute;
+    top: -7px;
+  }
+
+  .testimonial-description .stair1, .testimonial-description .stair2, .testimonial-description .stair3, .testimonial-description .stair4 {
+    float: left;
+    display: block;
+  }
+
+  .testimonial-description .stair1, .testimonial-description .stair2, .testimonial-description .stair3, .testimonial-description .stair4 {
+    margin-left: -80px;
+  }
+
+  .testimonial-description .stair2, .testimonial-description .stair3, .testimonial-description .stair4 {
+      clear: both;
+  }
+
+  .testimonial-description .stair1 {
+    margin-bottom: 0;
+    min-height: 20px;
+    width: 140px;
+  }
+
+  .testimonial-description .stair2 {
+    min-height: 20px;
+    width: 110px;
+  }
+  .testimonial-description p {
+    line-height: 1.7;
+    font-size: 1.7rem;
+  }
+  .testimonial-attribution {
+    color: #FFF;
+  }
+
+  .testimonial-attribution h5 {
+    font-weight: 600;
+  }
+
+  .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+    cursor: auto;
+    background-color: #FFF; */
+    opacity: 1;
+  }
+
+  .common_thank_you_message {
+    margin-bottom:20px;
+  }
+  .common_thank_you_message h3 {
+    font-size: 5rem;
+  }
+  .common_thank_you_message h3 strong {
+    font-weight: 400;
+  }
+  .common_thank_you_message p {
+    font-size: 2.1rem;
+  }
+  .btn-facebook {
+    background-color: #3b5998;
+    border-color: #3b5998;
+  }
+
+  .btn-facebook:hover {
+    background-color: {{ "#3b5998" | darker_color }};
+    border-color: {{ "#3b5998" | darker_color }};
+  }
+
+  .btn-twitter {
+    background-color: #00aced;
+    border-color: #00aced;
+  }
+
+  .btn-twitter:hover {
+    background-color: {{ "#00aced" | darker_color }};
+    border-color: {{ "#00aced" | darker_color }};
+  }
+
+  .btn-pinterest {
+    background-color: #cb2027;
+    border-color: #cb2027;
+  }
+
+  .btn-pinterest:hover {
+    background-color: {{ "#cb2027" | darker_color }};
+    border-color: {{ "#cb2027" | darker_color }};
+  }
+
+  .btn-gplus {
+
+    background-color:#dd4b39;
+    border-color: #dd4b39;
+  }
+
+  .btn-gplus:hover {
+    background-color: {{ "#dd4b39" | darker_color }};
+    border-color: {{ "#dd4b39" | darker_color }};
+  }
+
+  .btn-linkedin {
+    background-color:#007bb6;
+    border-color: #007bb6;
+  }
+
+  .btn-linkedin:hover {
+    background-color: {{ "#007bb6" | darker_color }};
+    border-color: {{ "#007bb6" | darker_color }};
+  }
+
+  .btn-email {
+    background-color: #3f3f3f;
+    border-color: #3f3f3f;
+  }
+
+  .btn-email:hover {
+    background-color: {{ "#3f3f3f" | darker_color }};
+    border-color: {{ "#3f3f3f" | darker_color }};
+  }
+
+
+
+  #cta-btn {
+
+    margin-bottom: 3rem;
+    padding-left: 6rem;
+    padding-right: 6rem;
+  }
+
+  #share_links img {
+    display:inline;
+  }
+
+
+  @media (max-width: 999px) {
+
+    .testimonial-description {
+      font-size: 16px;
+      line-height: 22px;
+    }
+
+    .testimonial-description:before,
+    .testimonial-description:after {
+      font-size: 25px;
+    }
+  }
+
+
+  @media (min-width: 768px) {
+
+    .second-headline {
+      padding-left: 9rem;
+      padding-right: 9rem;
+    }
+
+    .fluid-width-video-wrapper {
+      position: relative;
+      text-align: center;
+    }
+
+    .second-headline .fluid-width-video-wrapper {
+      width: 80% !important;
+    }
+
+    .fluid-width-video-wrapper,
+    .fluid-width-video-wrapper iframe, .fluid-width-video-wrapper object, .fluid-width-video-wrapper embed {
+      margin: 0 auto;
+    }
+
+    .logo-container img {
+      max-width: 150px;
+    }
+
+    .banner h1 {
+      font-size:6.25rem;
+    }
+
+    .social_share_link {
+      width:50px;
+    }
+
+
+    .testimonials-row {
+      margin-bottom:7rem;
+    }
+  }
+
+
+  @media (min-width: 1200px) {
+
+    .second-headline {
+      padding-left: 15rem;
+      padding-right: 15rem;
+    }
+
+  }
+
+  @media (min-width: 1440px) {
+
+    .second-headline .fluid-width-video-wrapper {
+      padding-top: 40% !important;
+      width: 65% !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .top-row img {
+      width: 150px;
+    }
+    .logo-container {
+      text-align: center;
+      width: 40%;
+      float: left;
+    }
+
+    .logo-container img {
+      max-width: 99px;
+    }
+
+    .second-headline {
+      padding-left: 7rem;
+      padding-right: 7rem;
+    }
+
+    .fluid-width-video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%;
+      padding-top: 35px;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .fluid-width-video-wrapper iframe, .fluid-width-video-wrapper object, .fluid-width-video-wrapper embed {
+      position: absolute;
+      top:0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .banner .btn{ float: left;}
+    .banner .kol-social-share-link { float: none; }
+    .banner .btn:first-child, .banner .btn:nth-child(4){border-left: none;}
+    .banner .btn:last-child, .banner .btn:nth-child(3){border-right: none;}
+    .banner button.btn{margin-top: 12px; width: 100%;  float: none;}
+
+    .banner h1 {
+      font-size:4.5rem;
+    }
+    .banner p {
+      font-size:18px;
+    }
+    h1.headline {
+      font-size: 3rem;
+    }
+    .section .img-responsive{margin:0 auto;}
+    .section-colored .img-responsive{margin:0 auto;}
+
+    .second-headline .f-video-editor.fr-fvn {
+      position: relative;
+      padding-bottom: 56.25%;
+      padding-top: 35px;
+      height: 0;
+      overflow: hidden;
+      display: block;
+    }
+
+    .second-headline .f-video-editor.fr-fvn iframe {
+      position: absolute;
+      top:0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+
+    .testimonial-description {
+      padding-right: 0;
+      border-right:0;
+      text-align: left;
+      line-height: 25px;
+    }
+
+    .testimonial-description:before {
+      font-size:20px;
+      top:0;
+    }
+
+    .testimonial-block {
+      margin-top: 0.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .testimonial-img-container {
+      text-align: center;
+    }
+
+    .testimonial-img {
+      max-width: 90px;
+      display:inline-block;
+    }
+  }
+
+
+  @media (max-width:480px) {
+
+    div embed, div object, div iframe, p embed, p object, p iframe {
+      max-height: 250px;
+    }
+
+    .logo-container {
+      width:100%;
+    }
+
+    .logo-container img {
+      margin: 0 auto;
+    }
+
+    .second-headline {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+
+    .banner h1 {
+      font-size:3rem;
+    }
+    .banner p {
+      font-size:16px;
+    }
+    h1.headline {
+      font-size: 2.75rem;
+    }
+    .sm_device {
+      width:100%;
+    }
+
+    .testimonial-description {
+      line-height: 20px;
+      font-size: 14px;
+    }
+
+    .testimonial-img {
+      max-width: 100%;
+    }
+  }
+
+  .fluid-width-video-wrapper:empty {
+    padding-top:0 !important;
+  }
+
+  .form-block {
+    max-width: 400px;
+    margin: auto;
+    text-align: center;
+  }
+
+  .form-block, .form-inline {
+    padding-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  #signup_form input[type="checkbox"] {
+    height: auto;
+  }
+
+  label.checkbox {
+    font-weight: normal;
+  }
+</style>
+
+</head>
+<body>
+  <div class="banner header-banner">
+    <div class="container">
+      <div id="top-container" class="col-md-10 col-md-offset-1">
+        <div class="description" data-mercury="froala" data-content-name="description">Parkz</div>
+
+        <!-- Form -->
+        <div class="form-block" role="form">
+          <input id="email" class="required form-control input-lg " type="email" name="email" placeholder="{{element.placeholder}}" data-label-text="Email">
+          <!-- {% when 'text' %}
+          <input class="form-control {{element.required_class}} input-lg" id="{{element.name}}" name="{{element.name}}" placeholder="{{element.placeholder}}" type="text" data-label-text="{{element.display_text}}" />
+          {% when 'textarea' %}
+          <textarea id="{{element.name}}" class="form-control input-lg {{element.required_class}}" name="{{element.name}}" rows=3 placeholder="{{element.placeholder}}" data-label-text="{{element.display_text}}"></textarea>
+          {% when 'choice' %}
+          <select class="form-control input-lg" id="{{element.name}}" name="{{element.name}}"  placeholder="{{element.placeholder}}" data-label-text="{{element.display_text}}">
+            {% for choice in element.choices %}
+            <option>{{choice}}</option>
+            {% endfor %}
+          </select>
+          {% when 'checkbox' %}
+          <label class="checkbox">
+            <input type="checkbox" id="{{element.name}}" class="input-lg {{element.required_class}}" name="{{element.name}}" data-label-text="{{element.display_text}}" />{{element.placeholder}}
+          </label>
+          {% endcase %}
+          {% endfor %} -->
+          <button id="submit_button" class="btn btn-primary input-lg" name="submit" type="submit">{{content.button_text}}</button>
+        </div>
+
+        <div id="subscribe">
+          <!-- {% common_thankyou_share_with_customized_links %} -->
+        </div>
+        <!-- Response -->
+        <div id="kol_fade"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="section feature-section">
+      <div class="row-fluid feature">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-sm-push-6 feature-img img-1"></div>
+        <div class="col-md-6 col-sm-6 col-sm-pull-6 text-center">
+          <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+              <div class="feature-text" data-mercury="froala" data-content-name="feature_one">
+                {{content.feature_one}}
+              </div><!-- End feature-text -->
+            </div><!-- End Column -->
+          </div><!-- End Row -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="section feature-section">
+      <div class="row-fluid feature">
+        <div class="col-lg-6 col-md-6 col-sm-6 feature-img img-2"></div>
+        <div class="col-md-6 col-sm-6 text-center">
+          <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+              <div class="feature-text" data-mercury="froala" data-content-name="feature_two">
+                {{content.feature_two}}
+              </div><!-- End feature-text -->
+            </div><!-- End Column -->
+          </div><!-- End Row -->
+      </div>
+    </div>
+
+    <div class="section feature-section">
+      <div class="row-fluid feature">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-sm-push-6 feature-img img-3"></div>
+        <div class="col-md-6 col-sm-6 col-sm-pull-6 text-center">
+          <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+              <div class="feature-text" data-mercury="froala" data-content-name="feature_three">
+                {{content.feature_three}}
+              </div><!-- End feature-text -->
+            </div><!-- End Column -->
+          </div><!-- End Row -->
+        </div>
+      </div>
+    </div>
+
+    <div class="section feature-section">
+      <div class="row-fluid feature">
+        <div class="col-lg-6 col-md-6 col-sm-6 feature-img img-4"></div>
+        <div class="col-md-6 col-sm-6 text-center">
+          <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+              <div class="feature-text" data-mercury="froala" data-content-name="feature_four">
+                {{content.feature_four}}
+              </div><!-- End feature-text -->
+            </div><!-- End Column -->
+          </div><!-- End Row -->
+      </div>
+    </div>
+
+  <div class="footer">
+    <div class="container">
+      <footer>
+
+        <div class="row">
+          <div class="col-lg-12">
+
+              <button id="cta-btn" type="button" class="btn btn-default btn-lg btn-primary ">{{content.button_text}}</button>
+          </div>
+
+          <div class="col-lg-12">
+            <div class="social social-bottom">
+            
+            </div> <!--// .social -->
+          </div>
+          <div class="col-md-6">
+            <div class="footer-text pull-left"  data-mercury="froala" data-content-name="the_footer_text">
+              {{content.the_footer_text}}
+            </div>
+          </div>
+          <div class="footer-text col-md-6">
+            <p><a class="pull-right" id="privacy_link" href="{{page_url}}/privacy" >{{content.privacy_link_text}}</a>
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <script src="https://d1y0v6ricksqp.cloudfront.net/themes/viralrewards/bootstrap.cls.js"></script>
+
+<!--   <script src="{% asset_path js/jquery-libs/backstretch/2.0.4/jquery.backstretch.min.js %}"></script>
+  <script>
+
+
+    $(document).ready(function() {
+
+      $("#signup_form").bind("kol:success", function(e, data, status, xhr) {
+        setInterval(function() {
+          $(".header-banner").data("backstretch") && $(".header-banner").data("backstretch").resize();
+        }, 100);
+      });
+
+      $('#cta-btn').bind('click', function(e) {
+        e.preventDefault();
+        $('html, body').animate({
+            scrollTop: ( $('.header-banner .description').first().offset().top )
+        }, 700, function() {
+          $( '#email' ).focus();
+        });
+      });
+
+
+
+    });
+
+
+  </script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.0/jquery.scrollTo.min.js"></script>
+
+  <!-- Placed at the end of the document so the pages load faster -->
+</body>
+</html>
+
