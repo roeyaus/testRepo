@@ -10,6 +10,9 @@ import { Navigation } from 'react-native-navigation';
 import ParkzTextField from '../components/ParkzTextField'
 import ParkzButton from '../components/ParkzButton'
 import * as ParkzActions from '../reducers/parkzActions'
+import * as firebase from 'firebase'
+
+
 class SignupScreen extends Component {
   constructor(props) {
     super(props)

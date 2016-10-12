@@ -76,7 +76,7 @@ constructor(props) {
           { latitude: 32.096824, longitude: 34.774748 },
         ]}
         strokeColor= '#f007'
-        fillColor= '#f007'
+        fillColor= 'rgba(245, 135, 32, 0.3)'
         strokeWidth = {3}
         />
       <MapView.Marker key="centerMarker" coordinate={{ latitude: this.props.state.region.latitude, longitude: this.props.state.region.longitude }} />

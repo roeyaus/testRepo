@@ -15,7 +15,7 @@ class CarReturningView extends React.Component {
     constructor(props) {
         super(props)
         console.log(props)
-    }
+  }
 
     getViewByState() {
        switch (this.props.order.orderStatus)
@@ -30,7 +30,7 @@ class CarReturningView extends React.Component {
                 )
            case orderStatusEnum.carReturning:
            return (
-                 <View View style={[style.overlayViewStyle, { height: 200 }]}>  
+                 <View style={[style.overlayViewStyle, { height: 200 }]}>  
                 <Text> {this.props.valet.firstName } is returning your car.</Text>
                 <Image source={require('../assets/images/falcon.jpg')} style= {{width : 100, height : 100}} />
                 <Text> {this.props.order.valetETAInMinutes } </Text>

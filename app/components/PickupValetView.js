@@ -10,6 +10,8 @@ import {connect} from 'react-redux'
 import * as style from '../style.js'
 import ParkzButton from './ParkzButton'
 import NavButton from './NavButton'
+import ParkzDynamicOverlay from './ParkzDynamicOverlay'
+import CallTextBar from './CallTextBar'
 class PickupValetView extends React.Component {
     constructor(props) {
         super(props)
@@ -18,8 +20,24 @@ class PickupValetView extends React.Component {
 
     render() {
         return (
-            <View View style={[style.overlayViewStyle, { height: 400 }]}>
+             <ParkzDynamicOverlay expandable={true} summaryView={
+            
+            <View style={[style.nonExpandableOverlayViewStyle]}>
+            <NavButton />     
+            <CallTextBar  />
+            <View style={{flex : 1, flexDirection : 'row', alignItems : 'center'}}>
+            <Image source={require('../assets/images/falcon.jpg')} style= {{marginRight : 50, width : 60, height : 60}} />
+                <Text>
+                    {this.props.valet && this.props.valet.firstName}'s ETA is  : {this.props.order.valetETAInMinutes} minutes
+                </Text>
+            </View>
+            <ParkzButton buttonStyle = {{ backgroundColor: 'red' }} text='Cancel Order' width={200} onPress={() => this.props.onCancel()}  />
+     
+            </View>}>
+            
+            <View style={[style.overlayViewStyle]}>
                 <NavButton />
+                <CallTextBar  /> 
                 <Text>
                     Your valet is: {this.props.valet && this.props.valet.firstName}
                 </Text>
@@ -29,7 +47,8 @@ class PickupValetView extends React.Component {
                 </Text>
                 <Text> Don't worry, you can cancel at any time until your car gets picked up </Text>
                 <ParkzButton buttonStyle = {{ backgroundColor: 'red' }} text='Cancel Order' width={200} onPress={() => this.props.onCancel()}  />
-            </View>
+       </View>
+</ParkzDynamicOverlay>
         )
     }
 }

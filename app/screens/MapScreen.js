@@ -22,7 +22,7 @@ import CarReturningView from '../components/CarReturningView'
 import LookingForValet from '../components/LookingForValet'
 import ParkzMapView from '../components/ParkzMapView'
 import { Navigation } from 'react-native-navigation';
-
+import * as firebase from 'firebase'
 import {connect} from 'react-redux'
 import { setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents, startListenToOrderFBEvents } from '../reducers/parkzActions'
 
@@ -234,8 +234,7 @@ class MapScreen extends React.Component {
         <ParkzMapView state={this.state}/>
         <View style = {{
           flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', position: 'absolute',
-          top: 10,
-          left: 10, width: 300
+          top: 10, left : 5, right : 5
         }}>
 
           <GooglePlacesAutocomplete
@@ -269,6 +268,8 @@ class MapScreen extends React.Component {
             }}
             styles={{
               listView: {
+                marginRight : 5,
+                marginLeft : 5,
                 backgroundColor: 'white',
                 borderRadius: 10,
                 shadowColor: "#000000",
@@ -291,6 +292,7 @@ class MapScreen extends React.Component {
                 height: 40,
                 borderRadius: 10,
                 borderWidth: 2,
+                borderColor : 'orange',
                 shadowColor: "#000000",
                 shadowOpacity: 0.8,
                 shadowRadius: 10,
@@ -358,3 +360,4 @@ const mapStateToProps = (state) => ({
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapScreen)
+

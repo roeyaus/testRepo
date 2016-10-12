@@ -20,7 +20,7 @@ const firebaseConfig = {
   storageBucket: "parkz-1363.appspot.com",
 };
 
-const firebaseApp = firebase.initializeApp(firebaseConfig);
+var firebaseApp = firebase.initializeApp(firebaseConfig);
 
 //react native navigation with redux requires this
 export default class Application {

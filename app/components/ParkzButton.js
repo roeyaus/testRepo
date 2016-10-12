@@ -3,14 +3,14 @@ import {
 StyleSheet,
 View,
 Text,
-  TouchableHighlight,
+  TouchableOpacity,
 } from 'react-native';
 
 const ParkzButton = ({ onPress, text, buttonStyle, textStyle }) => (
-        <TouchableHighlight style={ [ styles.button, buttonStyle ]  }
+        <TouchableOpacity style={ [ styles.button, buttonStyle ]  }
             onPress = {onPress}>
           <Text style={[ styles.buttonText, textStyle ]}>{text}</Text>
-          </TouchableHighlight>
+          </TouchableOpacity>
     )
 
 

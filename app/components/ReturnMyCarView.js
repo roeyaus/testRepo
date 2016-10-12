@@ -18,7 +18,7 @@ class ReturnMyCarView extends React.Component {
     }
 
     getTextByOrderState() {
-        return (!this.props.isParked ? <Text> {this.props.valet.firstName } is parking your car.</Text> : 
+        return (!this.props.isParked ? <Text> {this.props.valet.firstName } is parking your car...</Text> : 
             <Text> Your car is parked at { this.props.order.parkingLocation.destination }</Text>
         )
     }
@@ -27,7 +27,7 @@ class ReturnMyCarView extends React.Component {
             <View View style={[style.overlayViewStyle, { height: 200 }]}>
                 {this.getTextByOrderState()}
                 {this.props.isParked || <Image source={require('../assets/images/falcon.jpg')} style= {{width : 100, height : 100}} />}
-                <ParkzButton buttonStyle = {{ backgroundColor: 'green' }} text='Return My Car' width={200} onPress={() => this.props.onPress()}  />
+                <ParkzButton buttonStyle = {{ backgroundColor: 'green' }} text='Get My Car' width={200} onPress={() => this.props.onPress()}  />
             </View>
         )
     }
