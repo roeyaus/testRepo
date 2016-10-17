@@ -7,9 +7,12 @@ import {
   View,
   TouchableHighlight,
   TextInput,
-  Button
+  Button,
+  Image
 } from 'react-native';
 import { connect } from 'react-redux'
+import ParkzButton from '../components/ParkzButton'
+import { parkzIcon, parkzColor } from '../style'
 
 class FirstUseScreen extends React.Component {
     constructor(props) {
@@ -17,27 +20,27 @@ class FirstUseScreen extends React.Component {
     }
   render() {
       return (
-      <View style={styles.menuView}>
-          <Text>Hello, {this.props.user == null ? "guest" : this.props.user.firstName}</Text>
+      <View style={styles.container}>
+      <View style={styles.iconView}>
+          <Text style={{fontSize : 72, color : 'white'}}>Parkz</Text>
+          <Image source={require('../assets/images/carkeys.png')}  />
+      </View>
           <View style={styles.buttonRowView}>
-          <TouchableHighlight style={[styles.button, styles.loginButton]}
+          <ParkzButton text="Log In"
             onPress = {() => {this.props.navigator.push({
               title: "Log In",
               screen: "Parkz.LoginScreen",
               passProps: { }
             });
-        }}>
-            <Text style={styles.buttonText}>Log In</Text>
-          </TouchableHighlight>
-          <TouchableHighlight style={[styles.button, styles.signupButton]}
+        }}/>
+
+          <ParkzButton text="Sign Up"
             onPress = {() => {this.props.navigator.push({
               title: "Sign Up",
               screen: "Parkz.SignupScreen",
               passProps: { }
             });
-        }}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableHighlight>
+        }}/>
           </View>
       </View>
 )
@@ -51,32 +54,30 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps)(FirstUseScreen)
 
 const styles = StyleSheet.create({
-    menuView : {
+    container : {
         flex : 1,
         flexDirection : 'column',
-        justifyContent : 'space-between',
-        alignItems : 'center',
-        marginTop : 30
+        justifyContent : 'space-around',
+        backgroundColor : 'rgba(245, 135, 32, 1.0)'
+    },
+    iconView : {
+      flex : 1,
+      flexDirection : 'column',
+      justifyContent : 'space-around',
+      alignItems : 'center'
     },
     buttonRowView : {
         flexDirection : 'row',
-        justifyContent : 'space-between',
-        marginBottom : 30
-    },
-    button : {
-        width : 80,
-        height : 40,
-        borderRadius : 5,
-        alignItems : "center",
-        justifyContent : "center",
-        marginLeft : 50,
-        marginRight : 50
+        justifyContent : 'space-around',
+        alignItems : 'center',
+        marginBottom : 30,
+        marginTop : 30
     },
     loginButton : {
-        backgroundColor : "red",
+        backgroundColor : "orange",
     },
     signupButton : {
-        backgroundColor : "blue",
+        backgroundColor : "orange",
     },
     buttonText : {
         textAlign : "center",

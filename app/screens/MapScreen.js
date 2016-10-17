@@ -25,11 +25,26 @@ import { Navigation } from 'react-native-navigation';
 import * as firebase from 'firebase'
 import {connect} from 'react-redux'
 import { setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents, startListenToOrderFBEvents } from '../reducers/parkzActions'
-
+import {navBarStyle} from '../style'
 import { orderStatusEnum } from '../utils/enums.js'
 import { asyncGetETA} from '../utils/valetLocationUpdater.js'
 
 class MapScreen extends React.Component {
+
+  static navigatorButtons = {
+    leftButtons: [
+      {
+        icon: require('../assets/images/menu_icon.png'), // for icon button, provide the local image asset name
+        id: 'drawer', // id for this button, given in onNavigatorEvent(event) to help understand which button was clicked,
+        disableIconTint: true,
+        width : 20,
+        height : 20
+      }
+    ]
+  };
+
+ 
+
   constructor(props) {
     super(props)
     this.state = {
@@ -46,6 +61,18 @@ class MapScreen extends React.Component {
       canPlaceOrder: true,
       hasWaze: false,
       valetData: []
+    }
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+  }
+
+   onNavigatorEvent(event) { // this is the onPress handler for the two buttons together
+    if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
+      if (event.id == 'drawer') { // this is the same id field from the static navigatorButtons definition
+        this.props.navigator.toggleDrawer({
+        side: 'left', // the side of the drawer since you can have two, 'left' / 'right'
+        animated: true // does the toggle have transition animation or does it happen immediately (optional)
+      });
+      }
     }
   }
 
@@ -220,7 +247,7 @@ class MapScreen extends React.Component {
           screen: {
             screen: 'Parkz.OrderCompletedScreen',
             title: 'Thank You!',
-            navigatorStyle: {}
+            navigatorStyle: navBarStyle
           }
         })
         break;

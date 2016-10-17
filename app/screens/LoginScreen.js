@@ -12,6 +12,8 @@ import { connect } from 'react-redux'
 import ParkzButton from '../components/ParkzButton'
 import * as ParkzActions from '../reducers/parkzActions'
 import { Navigation } from 'react-native-navigation';
+import * as styleFile from '../style'
+
 
 class LoginScreen extends React.Component {
     constructor(props) {
@@ -79,7 +81,7 @@ class LoginScreen extends React.Component {
                     screen: {
                       screen: 'Parkz.MainScreen',
                       title: 'Parkz',
-                      navigatorStyle: {}
+                      navigatorStyle: styleFile.navBarStyle
                     },
                     drawer: {
                       type: "MMDrawer",

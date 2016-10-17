@@ -7,7 +7,7 @@ import {
     Image
 } from 'react-native';
 import {connect} from 'react-redux'
-import * as style from '../style.js'
+import {overlayStyles} from '../style.js'
 import ParkzButton from './ParkzButton'
 import NavButton from './NavButton'
 import ParkzDynamicOverlay from './ParkzDynamicOverlay'
@@ -22,11 +22,11 @@ class PickupValetView extends React.Component {
         return (
              <ParkzDynamicOverlay expandable={true} summaryView={
             
-            <View style={[style.nonExpandableOverlayViewStyle]}>
+            <View style={[overlayStyles.nonExpandableOverlayViewStyle]}>
             <NavButton />     
             <CallTextBar  />
             <View style={{flex : 1, flexDirection : 'row', alignItems : 'center'}}>
-            <Image source={require('../assets/images/falcon.jpg')} style= {{marginRight : 50, width : 60, height : 60}} />
+            <Image source={require('../assets/images/falcon.jpg')} style= {{marginRight : 20, width : 60, height : 60}} />
                 <Text>
                     {this.props.valet && this.props.valet.firstName}'s ETA is  : {this.props.order.valetETAInMinutes} minutes
                 </Text>
@@ -35,7 +35,7 @@ class PickupValetView extends React.Component {
      
             </View>}>
             
-            <View style={[style.overlayViewStyle]}>
+            <View style={[overlayStyles.overlayViewStyle]}>
                 <NavButton />
                 <CallTextBar  /> 
                 <Text>

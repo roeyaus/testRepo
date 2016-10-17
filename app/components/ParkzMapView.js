@@ -75,7 +75,7 @@ constructor(props) {
           { latitude: 32.073773, longitude: 34.765000 },
           { latitude: 32.096824, longitude: 34.774748 },
         ]}
-        strokeColor= '#f007'
+        strokeColor= 'rgba(245, 135, 32, 0.3)'
         fillColor= 'rgba(245, 135, 32, 0.3)'
         strokeWidth = {3}
         />

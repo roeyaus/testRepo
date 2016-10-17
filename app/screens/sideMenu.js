@@ -4,16 +4,19 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableHighlight,
+  TouchableOpacity,
 } from 'react-native';
-
+import {parkzColor} from '../style'
 export default class SideMenu extends React.Component {
   render() {
       return (
       <View style={styles.menuView}>
-      <TouchableHighlight>
-      <Text>Hi!</Text>
-      </TouchableHighlight>
+      <TouchableOpacity style={styles.touchOpStyle}>
+      <Text style={styles.menuText}>Payment Info</Text>
+      </TouchableOpacity>
+       <TouchableOpacity style={styles.touchOpStyle}>
+      <Text style={styles.menuText}>About</Text>
+      </TouchableOpacity>
       </View>
 )
   }
@@ -23,6 +26,16 @@ const styles = StyleSheet.create({
     menuView : {
         flex : 1,
         flexDirection : 'column',
-        marginTop : 60
+        justifyContent : 'flex-start',
+        marginTop : 30,
+        backgroundColor : parkzColor
+    },
+    touchOpStyle : {
+      marginTop : 10,
+      marginBottom : 10
+    },
+    menuText : {
+      color : 'white',
+      fontSize : 20
     }
 })

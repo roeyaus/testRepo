@@ -7,13 +7,17 @@ var {
 } = React;
 
 const overlayDimensions = {
-    minimizedViewHeight : 100,
+    minimizedViewHeight : 140,
     maximizedViewHeight : 400
 }
 
-module.exports = StyleSheet.create({
-
-
+const parkzColor = 'rgba(245, 135, 32, 1.0)'
+const parkzIcon = require('./assets/images/carkeys.png')
+const navBarStyle = {
+    navBarBackgroundColor : 'rgba(245, 135, 32, 1.0)', 
+    navBarTextColor : 'white'
+}
+const overlayStyles = StyleSheet.create({
 
 overlayExpandedViewStyle : {
   flex : 1,
@@ -33,7 +37,9 @@ overlayMinimizedViewStyle : {
     height : overlayDimensions.minimizedViewHeight,
     bottom : 0,
     right : 0,
-    left : 0
+    left : 0,
+    marginTop : 10,
+    marginBottom : 10
 },
 
 nonExpandableOverlayViewStyle : {
@@ -42,7 +48,9 @@ nonExpandableOverlayViewStyle : {
     backgroundColor:'rgba(255,255,255,0.8)', 
     alignItems : 'center',
     justifyContent : 'space-around',
-    height : overlayDimensions.minimizedViewHeight
+    height : overlayDimensions.minimizedViewHeight,
+    marginTop : 10,
+    marginBottom : 10
 },
 
 overlayViewStyle : {
@@ -56,4 +64,11 @@ overlayViewStyle : {
 
 
 
+
 });
+
+
+export { parkzColor,
+parkzIcon,
+navBarStyle,
+overlayStyles}

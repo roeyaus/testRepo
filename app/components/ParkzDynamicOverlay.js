@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import {connect} from 'react-redux'
-import * as style from '../style.js'
+import {overlayStyles} from '../style.js'
 import ParkzButton from './ParkzButton'
 import { orderStatusEnum } from '../utils/enums.js'
 
@@ -44,7 +44,7 @@ export default class ParkzDynamicOverlay extends React.Component {
 			)
 
 		return (
-			<View style={ this.state.expanded ? style.overlayExpandedViewStyle : style.overlayMinimizedViewStyle }>
+			<View style={ this.state.expanded ? overlayStyles.overlayExpandedViewStyle : overlayStyles.overlayMinimizedViewStyle }>
 				
 				{this.state.expanded ? this.props.children : this.props.summaryView}
 				{ this.props.expandable && arrowImage }

@@ -10,6 +10,7 @@ import {createParkzStore, loadStore} from './storage/store.js'
 import { Provider } from 'react-redux';
 // screen related book keeping
 import { registerScreens } from './screens';
+import {navBarStyle} from './style'
 
 
 // Initialize Firebase
@@ -30,18 +31,19 @@ export default class Application {
     registerScreens(store, Provider);
     persistStore(store, { storage: AsyncStorage }, null).purge(['order'])
     persistStore(store, { storage: AsyncStorage }, null).purge(['valetData'])
+    //persistStore(store, { storage: AsyncStorage }, null).purge(['user'])
     loadStore(store, () => {
 
       const state = store.getState()
       console.log("state restored : ", state, ", loading initial screen")
       var screen = "Parkz.FirstUseScreen"
-      var title = "Hi!"
+      var title = "Parkz"
       if (!state.user || !state.user.loggedIn) {
         Navigation.startSingleScreenApp({
           screen: {
             screen: screen,
             title: title,
-            navigatorStyle: {}
+            navigatorStyle: navBarStyle
           },
           passProps: {
           }
@@ -58,8 +60,14 @@ export default class Application {
               screen: {
                 screen: screen,
                 title: title,
-                navigatorStyle: {}
+                navigatorStyle: navBarStyle
               },
+              drawer: { // optional, add this if you want a side menu drawer in your app
+    left: { // optional, define if you want a drawer from the left
+      screen: 'Parkz.SideMenu' // unique ID registered with Navigation.registerScreen
+    },
+    disableOpenGesture: false // optional, can the drawer be opened with a swipe instead of button
+  },
               passProps: {
               }
             });
@@ -73,7 +81,7 @@ export default class Application {
               screen: {
                 screen: screen,
                 title: title,
-                navigatorStyle: {}
+                navigatorStyle: navBarStyle
               },
               passProps: {
               }
@@ -87,7 +95,7 @@ export default class Application {
             screen: {
               screen: screen,
               title: title,
-              navigatorStyle: {}
+              navigatorStyle: navBarStyle
             },
             passProps: {
             }

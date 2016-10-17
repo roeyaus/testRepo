@@ -1,4 +1,4 @@
-import * as firebase from 'firebase'
+import firebase from 'firebase'
 import { orderStatusEnum } from '../utils/enums.js'
 /*
  * action types
@@ -28,15 +28,19 @@ export function setUserLocation(location) {
   return function (dispatch, getState) {
     return new Promise(function (res, rej) {
       var update = {}
-      update['users/' + firebase.auth().currentUser.uid + '/location'] = location
-      firebase.database().ref().update(update).then(() => {
-        //DB update was OK, now update our global state
-        console.log("updated firebase with user location")
-        res()
-      }).catch(error => {
-        console.log("faild to update location : ", error)
-        rej()
-      })
+      if (firebase.auth().currentUser)
+      {
+        update['users/' + firebase.auth().currentUser.uid + '/location'] = location
+        firebase.database().ref().update(update).then(() => {
+          //DB update was OK, now update our global state
+          console.log("updated firebase with user location")
+          res()
+        }).catch(error => {
+          console.log("faild to update location : ", error)
+          rej()
+        })
+      }
+ 
     })
   }
 }
@@ -96,7 +100,7 @@ export function setOpenOrder(order) {
     updates['/orders/' + newOrderKey] = order;
     updates['/user-orders/' + firebase.auth().currentUser.uid + '/' + newOrderKey] = true
     order.orderID = newOrderKey
-    order.orderStatus = orderStatusEnum.open
+    order.orderStatus = orderStatusEnum.carPickedup
     return new Promise(function (res, rej) {
       firebase.database().ref().update(updates).then(() => {
         //DB update was OK, now update our global state
