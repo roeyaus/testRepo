@@ -4,9 +4,7 @@
 	* login button
 	* 
 * Main screen : 
-	* Overlay views slide up
 	* Overlay views slide down after a few seconds 
-	* Overlay views add minimize/maximize icons
 	* Connect Waze button
 	* Locating Valet overlay : 
 		* styling
@@ -17,4 +15,5 @@
 		* Add pickup address 
 	* Valet Parking overlay : 
 		* add text/call icons
+* 
 

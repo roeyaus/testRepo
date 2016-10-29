@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { SET_CURRENT_USER, SET_ORDER, SET_VALET_DATA, CANCEL_ORDER } from './parkzActions'
+import {  SET_USER_LOCATION, SET_USER_DEST, SET_CURRENT_USER, SET_ORDER, SET_VALET_DATA, CANCEL_ORDER } from './parkzActions'
 import Immutable from 'seamless-immutable';
 import { REHYDRATE } from 'redux-persist/constants';
 import { orderStatusEnum } from '../utils/enums.js'
@@ -13,16 +13,32 @@ const initialUser = {
         password : "",
         paymentMethod : undefined,
         openOrderID : undefined,
-        prevOrderIDs : []
+        prevOrderIDs : [],
+        location : {
+          lat : 0.0,
+          long : 0.0
+        },
+        selectedDestination : { 
+          destString : "",
+          lat : 0.0,
+          long : 0.0,
+          etaToDestInMinutes : 0
+        },
+        
 }
 
 function userReducer(user = initialUser, action) {
-  
+  const newUser = Object.assign({}, user, action.user)
   switch (action.type) {
     case SET_CURRENT_USER:
-          const newUser = Object.assign({}, user, action.user)
           newUser.loggedIn = true
           console.log("user logged in : ", newUser)
+          return newUser
+    case SET_USER_LOCATION:
+          newUser.location = action.location
+          return newUser
+    case SET_USER_DEST:
+          newUser.selectedDestination = action.destination
           return newUser
     default:
       return user
@@ -54,7 +70,8 @@ const initialOrder = {
       tip: 0,
       rating: 0,
       comments: "",
-      valetETAInMinutes : 0
+      valetETAInMinutes : 0,
+      userETAInMinutes : 0
 }
 
 function orderReducer(order = initialOrder, action) {

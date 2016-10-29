@@ -24,7 +24,7 @@ import ParkzMapView from '../components/ParkzMapView'
 import { Navigation } from 'react-native-navigation';
 import * as firebase from 'firebase'
 import {connect} from 'react-redux'
-import { setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents, startListenToOrderFBEvents } from '../reducers/parkzActions'
+import { setUserDestAndETA, setOpenOrder, setUserLocation, setCancelOrder, startListenToValetFBEvents, startListenToOrderFBEvents } from '../reducers/parkzActions'
 import {navBarStyle} from '../style'
 import { orderStatusEnum } from '../utils/enums.js'
 import { asyncGetETA} from '../utils/valetLocationUpdater.js'
@@ -103,6 +103,7 @@ class MapScreen extends React.Component {
         }
       });
       this.props.updateLocation(position.coords)
+      this.props.updateUserDestAndETA(this.props.user, this.props.user.selectedDestination)
 
     }, (error) => {
       console.log(error)
@@ -283,6 +284,8 @@ class MapScreen extends React.Component {
                   latitudeDelta: this.state.region.latitudeDelta, longitudeDelta: this.state.region.longitudeDelta
                 }
               })
+              this.props.updateUserDestAndETA(this.props.user, { destString : data.description, lat : details.geometry.location.lat, 
+                long : details.geometry.location.lng}).then(null, null)
             } }
             getDefaultValue={() => {
               return ''; // text input default value 
@@ -376,6 +379,7 @@ const styles = StyleSheet.create({
 const mapDispatchToProps = (dispatch) => ({
   placeOrder: order => dispatch(setOpenOrder(order)),
   updateLocation: location => dispatch(setUserLocation(location)),
+  updateUserDestAndETA : (user,destination) => dispatch(setUserDestAndETA(user, destination)),
   cancelOrder: order => dispatch(setCancelOrder(order)),
   startListenValetUpdates: () => dispatch(startListenToValetFBEvents()),
   startListenOrderUpdates: () => dispatch(startListenToOrderFBEvents())
@@ -383,7 +387,8 @@ const mapDispatchToProps = (dispatch) => ({
 
 const mapStateToProps = (state) => ({
   valetData: Object.keys(state.valetData).map(key => state.valetData[key]),
-  order: state.order
+  order: state.order,
+  user : state.user
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapScreen)

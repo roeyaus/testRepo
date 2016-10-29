@@ -19,7 +19,7 @@ export default ParkzButton
 const styles = StyleSheet.create({
     button : {
         height : 40,
-        width : 100,
+        width : 150,
         borderRadius : 5,
         alignItems : "center",
         justifyContent : "center",

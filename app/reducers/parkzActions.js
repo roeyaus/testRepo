@@ -8,6 +8,8 @@ export const SET_CURRENT_USER = 'SET_CURRENT_USER'
 export const SET_ORDER = 'SET_ORDER'
 export const SET_VALET_DATA = 'SET_VALET_DATA'
 export const CANCEL_ORDER = 'CANCEL_ORDER'
+export const SET_USER_LOCATION = 'SET_USER_LOCATION'
+export const SET_USER_DEST = 'SET_USER_DEST'
 /*
  * action creators
  */
@@ -24,6 +26,51 @@ export function setValetData(valetData) {
   return { type: SET_VALET_DATA, valetData }
 }
 
+export function setUserLoc(location) {
+  return { type: SET_USER_LOCATION, location }
+}
+
+export function setUserDest(destination) {
+  return { type: SET_USER_DEST, destination }
+}
+
+
+/* 
+* Thunks
+*/
+
+export function setUserDestAndETA(user, destination) {
+  return function(dispatch, getState) {
+    return new Promise(function (res, rej) {
+      //we get the user's current location and calculate eta to the received destination
+        var url = "http://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + user.location.lat +
+            "," + user.location.long + "&destinations=" + destination.destString
+        console.log("maps API url : " + url)
+        fetch(url) //gets all public car parks (free or not)
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("google's response : " + JSON.stringify(data))
+            //iterate over google's response and get the ETA
+            for (i in data.rows[0].elements)
+            {
+                console.log(JSON.stringify(data.rows[0].elements[i]))
+                if (data.rows[0].elements[i].status == "OK")
+                {
+                    destination.etaToDestInMinutes = data.rows[0].elements[i].duration.value / 60
+                }
+
+            }
+           dispatch(setUserDest(destination))
+           res()
+        }).catch((error) => {
+           console.log("An error occured trying to get ETA! ", error)
+           rej()
+        })
+    })
+  }
+}
+
+
 export function setUserLocation(location) {
   return function (dispatch, getState) {
     return new Promise(function (res, rej) {
@@ -34,6 +81,7 @@ export function setUserLocation(location) {
         firebase.database().ref().update(update).then(() => {
           //DB update was OK, now update our global state
           console.log("updated firebase with user location")
+          dispatch(setUserLoc({lat : location.latitude, long : location.longitude}))
           res()
         }).catch(error => {
           console.log("faild to update location : ", error)
@@ -100,7 +148,7 @@ export function setOpenOrder(order) {
     updates['/orders/' + newOrderKey] = order;
     updates['/user-orders/' + firebase.auth().currentUser.uid + '/' + newOrderKey] = true
     order.orderID = newOrderKey
-    order.orderStatus = orderStatusEnum.carPickedup
+    order.orderStatus = orderStatusEnum.open
     return new Promise(function (res, rej) {
       firebase.database().ref().update(updates).then(() => {
         //DB update was OK, now update our global state
