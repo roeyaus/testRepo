@@ -4,12 +4,12 @@ const hoursInShift = 9
 const speedupFactor = 400
 const hourMS = 3600 * 1000 / speedupFactor
 const totalShiftTimeMS = hoursInShift * hourMS
-const totalParksInShift = 150
+const totalParksInShift = 50
 const avgTimeBetweenArrivalsMS = totalShiftTimeMS / totalParksInShift
-const avgParkingTimeMS = 2.5 * hourMS
-const numEmployeesInShift = 12
-const numParkEmployees = 6
-const avgTimeForParkingOrReturningMS =  25 * 60 * 1000 / speedupFactor
+const avgParkingTimeMS = 3 * hourMS
+const numEmployeesInShift = 4
+const numParkEmployees = 1
+const avgTimeForParkingOrReturningMS =  22 * 60 * 1000 / speedupFactor
 const timeBetweenChecksMS = 60 * 1000 / speedupFactor
 
 var elapsedTimeMS = 0
@@ -22,6 +22,9 @@ var waitingToReturnCarsArray = []
 var totalParkingTimeMS = 0
 var carsTurnedAway = 0
 var carsParked = 0
+
+var numCarsReturned = 0
+var totalReturnWaitTimeMS = 0
 
 var employeeCostPerShift = 35 * 9
 var totalEmployeeCost = employeeCostPerShift * numEmployeesInShift
@@ -74,8 +77,12 @@ function returnCar() {
 	if (waitingToReturnCarsArray.length > 0) {
 		console.log("we have a parked car, do we have anyone to return it?")
 		if (freeReturnWorkersArray.length > 0) {
+		
 			freeReturnWorkersArray.pop()
-			waitingToReturnCarsArray.pop()
+			totalReturnWaitTimeMS += waitingToReturnCarsArray[0].returnWaitTimeMS
+			console.log("totalReturnWaitTimeMS", totalReturnWaitTimeMS)
+			waitingToReturnCarsArray.shift()
+			numCarsReturned++
 			setTimeout(function() {
 		  		freeReturnWorkersArray.push(1)
 	  			console.log("worker has returned the car. waitingToReturnCarsArray size : ", waitingToReturnCarsArray.length)
@@ -84,6 +91,7 @@ function returnCar() {
 		else
 		{
 			//console.log("noone to return the car!")
+
 		}
 	}
 	else
@@ -123,6 +131,7 @@ setInterval(function () {
 	var totalParkingTimeInMinutes = totalParkingTimeMS * speedupFactor / 60 / 1000
 		console.log("cars parked : ", carsParked)
 		console.log("cars turned away : ", carsTurnedAway)
+		console.log("average return car wait time in minutes", (totalReturnWaitTimeMS / numCarsReturned) * speedupFactor / 60 / 1000)
 		console.log("******** Finance ********")
 		console.log("totalParkingTimeInMinutes : ", totalParkingTimeInMinutes)
 		console.log("total Revenue : ", totalParkingTimeInMinutes * parkRatePerMinute)
@@ -141,6 +150,7 @@ setInterval(function () {
 	waitingToReturnCarsArray.forEach((car) => {
 		car.returnWaitTimeMS += timeBetweenChecksMS
 	})
+	console.log(waitingToReturnCarsArray)
 
 	parkCar()
 	returnCar()
